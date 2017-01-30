@@ -26,8 +26,8 @@
     - char o_mode (-1, 0, 1)
  * Return values: pBuffer or NULL
  * Algorithm: Allocates memory for the buffer descriptor. If successful, do bound
- checks on function parameters and assign them to the buffer's variables. Otherwise
- return NULL.
+ checks on function parameters and assign them to the buffer's variables. If
+ all is clear, allocate the character buffer. Otherwise return NULL.
  */
 Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
     pBuffer pBD;    /* Pointer to buffer descriptor */
