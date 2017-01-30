@@ -28,7 +28,3 @@ bld/
 ## Ignore Visual Studio Code temporary files and project settings
 
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json

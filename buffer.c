@@ -3,15 +3,13 @@
  * Compiler: GCC 6.2.0
  * Author: Victor Fernandes, 040772243
  * Course: CST8152 - Compilers, Lab Section: 011
- * Date: September 12, 2016
+ * Date: February 1, 2017
  * Professor: Svillen Ravev
  * A character buffer utility with three modes of self-incrementation
  through dynamic memory allocation, and ability to set a mark flag.
  * Function list:
  * TODO: Function list and finish algorithm descriptions
  */
-
-
 
 
 #include <limits.h>
@@ -36,18 +34,39 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
 
     /* BEGIN CONFIGURING BUFFER */
 
-    /* Check if init_capacitt is whithin acceptable range */
+    /* Check if init_capacity is within acceptable range */
     if (init_capacity > SHRT_MAX || init_capacity < MIN_CAPACITY) {
         return NULL;
     }
+    /* Leaving cb_head allocation for last in the event of bad input */
 
+    
     /* Memory allocation */
     pBD = (Buffer *) calloc(1, sizeof(Buffer));
     if (!pBD) {
         return NULL; /* Abort execution immediatelly if allocation fails */
     }
 
-    /* Attempt to allocate memory to cb_head */
+    /* Check and set operation mode */
+    if (o_mode == 'f' || inc_factor == FIX_INC_FACTOR) {
+        pBD->mode = FIX_OP_MODE;
+        pBD->inc_factor = FIX_INC_FACTOR;
+    } else if (o_mode == 'a'
+            && (inc_factor >= MIN_INC_FACTOR) 
+            && (inc_factor <= MAX_ADD_INC_FACTOR)) {
+        pBD->mode = ADD_OP_MODE;
+        pBD->inc_factor = inc_factor;
+    } else if (o_mode == 'm' 
+            && (inc_factor >= MIN_MUL_INC_FACTOR)
+            && (inc_factor <= MAX_MUL_INC_FACTOR)) {
+        pBD->mode = MUL_OP_MODE;
+        pBD->inc_factor = inc_factor;
+    } else { /* Abort everything if any parameters are bad */
+        free(pBD);
+    return NULL;
+    }
+    
+    /* Attempt to initialize cb_head */
     pBD->cb_head = (char *) malloc(sizeof(char) * init_capacity);
     /* Abort configuration if allocation fails and release memory */
     if (!pBD->cb_head) {
@@ -55,21 +74,6 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
         return NULL;
     }
 
-    /* Check and set operation mode */
-    if (o_mode == 'f' || inc_factor == FIX_INC_FACTOR) {
-        pBD->mode = FIX_OP_MODE;
-        pBD->inc_factor = FIX_INC_FACTOR;
-    } else if (o_mode == 'a' && (inc_factor >= MIN_INC_FACTOR)) {
-        pBD->mode = ADD_OP_MODE;
-        pBD->inc_factor = inc_factor;
-    } else if (o_mode == 'm' && (inc_factor >= MIN_INC_FACTOR && inc_factor <= MAX_MUL_INC_FACTOR)) {
-        pBD->mode = MUL_OP_MODE;
-        pBD->inc_factor = inc_factor;
-    } else { /* Abort everything if parameters out of range (where applicable) */
-        free(pBD);
-        return NULL;
-    }
-    
     pBD->capacity = init_capacity;
     /* END CONFIGURING BUFFER */
     return pBD;

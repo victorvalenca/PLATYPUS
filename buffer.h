@@ -43,6 +43,7 @@
 #define MIN_CAPACITY 1      /* minimum character buffer capacity */
 #define FIX_INC_FACTOR 0    /* fixed increment factor constant */
 #define MIN_INC_FACTOR 1    /* minimum additive increment factor constant */
+#define MIN_MUL_INC_FACTOR 1    /* minumum multiplicative increment factor constant */
 #define MAX_ADD_INC_FACTOR 255  /* maximum additive increment factor constant */
 #define MAX_MUL_INC_FACTOR 100  /* maximum multiplicative increment factor constant */
 
