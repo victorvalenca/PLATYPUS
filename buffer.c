@@ -239,7 +239,7 @@ short b_setmark(Buffer* const pBD, short mark) {
     - pBuffer const pBD
  * Return value: 1, 0
  */
-int b_eob(Buffer* const pBD) {
+    int b_eob(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
     return pBD->eob;
 }
@@ -356,12 +356,13 @@ char b_getc(Buffer* const pBD) {
 int b_print(Buffer* const pBD) {
     int char_count = 0; /* Counter to track how many characters were sent to output */
     char char_buf;  /* "Buffer" character to load before output */
-    short tmp_offset = pBD->getc_offset;
+    short tmp_offset = OFFSET_RESET;
 
     if (!pBD || !pBD->cb_head) { return R_FAIL1; }
 
     if (b_isempty(pBD) == TRUE) { printf("The Buffer is empty.\n"); }
     else {
+        tmp_offset = pBD->getc_offset;
         pBD->getc_offset = OFFSET_RESET;
         do {
             char_buf = b_getc(pBD);
