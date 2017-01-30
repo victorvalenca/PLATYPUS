@@ -14,7 +14,7 @@
 
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
-#include <malloc.h> /* for dynamic memory allocation*/
+#include <mm_malloc.h> /* for dynamic memory allocation*/
 #include <limits.h> /* implementation-defined data type ranges and limits */
 
 /* constant definitions */
@@ -30,7 +30,7 @@
 #define R_FAIL2 -2         /* fail return value */
 #define LOAD_FAIL -2       /* load fail error */
 #define SET_R_FLAG 1       /* realloc flag set value */
-#define UNSET_R_FLAG 0     /* unset realloc flag */
+#define UNSET_R_FLAG 0     /* unset reallocation flag */
 #define SET_EOB_FLAG 1     /* set end of buffer flag */
 #define UNSET_EOB_FLAG 0   /* unset end of buffer flag */
 

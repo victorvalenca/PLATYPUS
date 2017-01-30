@@ -1,8 +1,8 @@
 /*  File name: platy_bt.c
- *  Purpose:This is the main program for Assignment #1, CST8152, Fall 16
- *  Version: 1.16.2
+ *  Purpose:This is the main program for Assignment #1, CST8152, Winter 17
+ *  Version: 1.17.1
  *  Author: Svillen Ranev
- *  Date: 6 September 2016
+ *  Date: 9 January 2017
  */   
 
 /* The #define _CRT_SECURE_NO_WARNINGS should be used in MS Visual Studio projects

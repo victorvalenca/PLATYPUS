@@ -270,35 +270,33 @@ Buffer* b_addc(Buffer* const pBD, char symbol) {
         return NULL;
     }
 
+    /* Reset reallocation flag */
     pBD->r_flag = UNSET_R_FLAG;
-    /* BEGIN BUFFER INCREASE */
+
+    /* BEGIN BUFFER INCREMENT */
     if (pBD->addc_offset == pBD->capacity){
-        if (pBD->mode == FIX_OP_MODE) { /* Fixed mode */
+        if (pBD->mode == FIX_OP_MODE) { /* Fixed mode, won't increment */
             return NULL;
         }
         else if (pBD->mode == ADD_OP_MODE) { /* Calculate new size for additive mode */
-            new_cap = pBD->capacity + (unsigned char) pBD->inc_factor;
-
-            /* Maximum additive increment is 255, therefore, if the current
-            capacity happens to be SHRT_MAX - 1, the value will underflow to a negative number
-            every time, and never "wrap" to a value greater than 1.
-            */
+            new_cap = pBD->capacity + pBD->inc_factor;
+            /* Make sure no short overflow happened */
             if (new_cap < MIN_CAPACITY){
                 return NULL;
             }
+
         }
         else if (pBD->mode == MUL_OP_MODE) { /* Calculate new size in multiplicative mode */
-            if (pBD->capacity == SHRT_MAX){
+            if (pBD->capacity == SHRT_MAX){ /* Do nothing if at maximum size */
                 return NULL;
             }
 
-            /* Mathematically, new_inc cannot be negative, since avail_space will
-            always be greater or equal to 0.
-            */
             avail_space = SHRT_MAX - pBD->capacity;
             new_inc = (avail_space * (unsigned char) pBD->inc_factor / 100);
-            /* The same situation in Additive mode (L284) applies to Multiplicative Mode */
-            if (new_inc <= MIN_CAPACITY && pBD->capacity < SHRT_MAX) {
+
+            /* Check if there is enough space for the new increment and
+            "trim" it if needed */
+            if (new_inc >= avail_space) {
                 new_cap = SHRT_MAX;
             }
             else {
@@ -307,11 +305,13 @@ Buffer* b_addc(Buffer* const pBD, char symbol) {
         }
 
         /* Reallocate memory to character buffer */
-        old_addr = pBD->cb_head; /* Keep track of old pointer address for checking if it changed */
+        old_addr = pBD->cb_head; /* Keep track of old pointer address to check if it changed */
         tmp_addr = (char *)realloc(pBD->cb_head, sizeof(char) * new_cap);
+        
         if (tmp_addr == NULL){
             return NULL; /* Abort everything if allocation fails */
         }
+
         pBD->cb_head = tmp_addr;
         pBD->capacity = new_cap;
         if (old_addr == pBD->cb_head) { /* Compare the old and new addresses and set flag appropriately */
@@ -363,16 +363,6 @@ int b_print(Buffer* const pBD) {
     if (b_isempty(pBD) == TRUE) { printf("The Buffer is empty.\n"); }
     else {
         pBD->getc_offset = OFFSET_RESET;
-        /* Trick the buffer into resetting the eob while printing the contents.
-         * The EOB flag will be set again once the loop is finished.
-         *
-        char_buf = b_getc(pBD);
-        b_retract(pBD);
-        for (char_count = 0; b_eob(pBD) == FALSE; char_count++) {
-            char_buf = b_getc(pBD);
-            printf("%c", (char) char_buf);
-        }
-        printf("\n");*/
         do {
             char_buf = b_getc(pBD);
             printf("%c", (char) char_buf);
@@ -397,36 +387,24 @@ int b_print(Buffer* const pBD) {
 int b_load(FILE* const fi, Buffer* const pBD) {
     char char_buf; /* "Buffer" character to be loaded before adding to cb_head */
     int char_count = 0; /* Character counter */
-    /*char eof_flag;*/
 
-    if (!fi || !pBD) { return LOAD_FAIL; }
-/*
-    for (char_count = 0; !feof(fi); char_count++) {
-        char_buf = (char) fgetc(fi);
-        if (char_buf == EOF) { break; }
+    if (!fi || !pBD) {
+        return LOAD_FAIL;
+    }
 
-        if (!b_addc(pBD, char_buf)) { return LOAD_FAIL; }
-    }*/
     do {
         char_buf = (char) fgetc(fi);
-        if (char_buf == EOF) { break; }
-
-        if (!b_addc(pBD, char_buf)) { return LOAD_FAIL; }
-        char_count++;
-    } while (!feof(fi));
-    /*eof_flag = feof(fi);
-    for (char_count = 0; !eof_flag; char_count++) {
-        char_buf = (char) fgetc(fi);
-        eof_flag = feof(fi);
-        
-        if (char_buf == EOF) { 
+        if (char_buf == (char) EOF) { 
             break;
         }
 
-        if (b_addc(pBD, char_buf) == NULL) {
+        if (!b_addc(pBD, char_buf)) { 
             return LOAD_FAIL;
         }
-    }*/
+        
+        char_count++;
+    } while (!feof(fi));
+
     return char_count;
 }
 
