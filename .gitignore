@@ -28,3 +28,7 @@ bld/
 ## Ignore Visual Studio Code temporary files and project settings
 
 .vscode/*
+
+## Miscellaneous files
+*.zip
+*.exe
