@@ -239,7 +239,7 @@ short b_setmark(Buffer* const pBD, short mark) {
     - pBuffer const pBD
  * Return value: 1, 0
  */
-    int b_eob(Buffer* const pBD) {
+int b_eob(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
     return pBD->eob;
 }
@@ -379,7 +379,7 @@ int b_print(Buffer* const pBD) {
 /* Loads symbols from a file to the buffer
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions: N/A
+ * Called functions: fgetc, feof, b_addc
  * Parameters:
     - FILE* const fi
     - pBuffer const pBD
