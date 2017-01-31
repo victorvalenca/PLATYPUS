@@ -221,7 +221,7 @@ char* b_cbhead(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: char*
  */
 char* b_setmark(Buffer* const pBD, short mark) {
     if (!pBD || mark < 0 || mark > pBD->addc_offset) { return NULL; }
@@ -333,7 +333,7 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
  */
 char b_getc(Buffer* const pBD) {
     if (!pBD) { return R_FAIL2; }
-    if (b_getcoffset(pBD) == pBD->addc_offset) {
+    if (pBD->getc_offset == pBD->addc_offset) {
         pBD->eob = SET_EOB_FLAG;
         return R_FAIL1;
     } else {
