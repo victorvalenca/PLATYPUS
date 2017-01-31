@@ -4,7 +4,7 @@
  * Author: Victor Fernandes, 040772243
  * Course: CST8152 - Compilers, Lab Section: 011
  * Date: February 1, 2017
- * Professor: Svillen Ravev
+ * Professor: Svillen Ranev
  * A character buffer utility with three modes of self-incrementation
  through dynamic memory allocation, and ability to set a mark flag.
  * Function list:
@@ -22,8 +22,8 @@
  * Called functions: calloc(), malloc(), free()
  * Parameters:
     - short init_capacity (0 - SHRT_MAX)
-    - char inc_factor (1 - 255)
-    - char o_mode (-1, 0, 1)
+    - char inc_factor (1 to 100 for multiplicative mode, 1 to 255 in additive mode, 0 for fixed mode)
+    - char o_mode (m, a, f)
  * Return values: pBuffer or NULL
  * Algorithm: Allocates memory for the buffer descriptor. If successful, do bound
  checks on function parameters and assign them to the buffer's variables. If
@@ -35,7 +35,7 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
     /* BEGIN CONFIGURING BUFFER */
 
     /* Check if init_capacity is within acceptable range */
-    if (init_capacity > SHRT_MAX || init_capacity < MIN_CAPACITY) {
+    if (init_capacity <= ZERO_CAPACITY) {
         return NULL;
     }
     /* Leaving cb_head allocation for last in the event of bad input */
@@ -51,9 +51,7 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
     if (o_mode == 'f' || inc_factor == FIX_INC_FACTOR) {
         pBD->mode = FIX_OP_MODE;
         pBD->inc_factor = FIX_INC_FACTOR;
-    } else if (o_mode == 'a'
-            && (inc_factor >= MIN_INC_FACTOR) 
-            && (inc_factor <= MAX_ADD_INC_FACTOR)) {
+    } else if (o_mode == 'a'){
         pBD->mode = ADD_OP_MODE;
         pBD->inc_factor = inc_factor;
     } else if (o_mode == 'm' 
@@ -89,7 +87,7 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
  */
 int b_isfull(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
-    if (pBD->addc_offset == pBD->capacity) {
+    if (b_size(pBD) == b_capacity(pBD)) {
         return TRUE;
     } else {
         return FALSE;
@@ -161,7 +159,7 @@ int b_mode(Buffer* const pBD) {
  * Return value: size_t
  */
 size_t b_incfactor(Buffer* const pBD) {
-    if (!pBD) { return 256; }
+	if (!pBD) { return ERR_INC_FACTOR; }
     return (size_t) pBD->inc_factor;
 }
 
@@ -225,10 +223,10 @@ char* b_cbhead(Buffer* const pBD) {
     - pBuffer const pBD
  * Return value: short
  */
-short b_setmark(Buffer* const pBD, short mark) {
-    if (!pBD || mark < 0 || mark > pBD->addc_offset) { return R_FAIL1; }
+char* b_setmark(Buffer* const pBD, short mark) {
+    if (!pBD || mark < 0 || mark > pBD->addc_offset) { return NULL; }
     pBD->mark_offset = mark;
-    return pBD->mark_offset;
+    return (pBD->cb_head) + pBD->mark_offset;
 }
 
 /* Reports the end-of-buffer flag state of the character buffer
@@ -255,7 +253,7 @@ possible and needed
  * Return value: pBuffer or NULL
  * Algorithm:
  */
-Buffer* b_addc(Buffer* const pBD, char symbol) {
+pBuffer b_addc(pBuffer const pBD, char symbol) {
     /* Variables used for calculating required space for reallocating cb_head
     for additive or multiplicative modes */
     short avail_space, new_inc, new_cap = 0;
@@ -265,8 +263,7 @@ Buffer* b_addc(Buffer* const pBD, char symbol) {
     char *old_addr;
     char *tmp_addr;
 
-    /* Check if pointers are valid before trying anything */
-    if (!pBD || !pBD->cb_head) {
+    if (!pBD) {
         return NULL;
     }
 
@@ -292,7 +289,7 @@ Buffer* b_addc(Buffer* const pBD, char symbol) {
             }
 
             avail_space = SHRT_MAX - pBD->capacity;
-            new_inc = (avail_space * (unsigned char) pBD->inc_factor / 100);
+            new_inc = avail_space * ((unsigned char) pBD->inc_factor / 100);
 
             /* Check if there is enough space for the new increment and
             "trim" it if needed */
@@ -358,9 +355,14 @@ int b_print(Buffer* const pBD) {
     char char_buf;  /* "Buffer" character to load before output */
     short tmp_offset = OFFSET_RESET;
 
-    if (!pBD || !pBD->cb_head) { return R_FAIL1; }
+    if (!pBD || !pBD->cb_head) {
+		return R_FAIL1;
+	}
 
-    if (b_isempty(pBD) == TRUE) { printf("The Buffer is empty.\n"); }
+    if (b_isempty(pBD) == TRUE) {
+		printf("The buffer is empty.\n");
+	}
+
     else {
         tmp_offset = pBD->getc_offset;
         pBD->getc_offset = OFFSET_RESET;
@@ -368,7 +370,7 @@ int b_print(Buffer* const pBD) {
             char_buf = b_getc(pBD);
             printf("%c", (char) char_buf);
             char_count++;
-        } while (b_eob(pBD) == FALSE);
+        } while (!b_eob(pBD));
         printf("\n");
     }
     /* Restore the getc_offset after printing */
@@ -390,21 +392,21 @@ int b_load(FILE* const fi, Buffer* const pBD) {
     int char_count = 0; /* Character counter */
 
     if (!fi || !pBD) {
-        return LOAD_FAIL;
+        return R_FAIL1;
     }
 
-    do {
+	while (!feof(fi)) {
         char_buf = (char) fgetc(fi);
-        if (char_buf == (char) EOF) { 
+		
+        if (char_buf == EOF) {
             break;
         }
 
         if (!b_addc(pBD, char_buf)) { 
             return LOAD_FAIL;
         }
-        
         char_count++;
-    } while (!feof(fi));
+    }
 
     return char_count;
 }
@@ -424,6 +426,7 @@ int b_reset(Buffer* const pBD) {
     pBD->getc_offset = OFFSET_RESET;
     pBD->mark_offset = OFFSET_RESET;
     pBD->eob = UNSET_EOB_FLAG;
+	pBD->r_flag = UNSET_R_FLAG;
     return TRUE;
 }
 

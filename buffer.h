@@ -14,7 +14,7 @@
 
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
-#include <mm_malloc.h> /* for dynamic memory allocation. NOTE: USE MALLOC.H FOR LINUX/WINDOWS.THIS IS FOR MACOS ONLY*/
+#include <malloc.h> /* for dynamic memory allocation. NOTE: USE MALLOC.H FOR LINUX/WINDOWS.THIS IS FOR MACOS ONLY*/
 #include <limits.h> /* implementation-defined data type ranges and limits */
 
 /* constant definitions */
@@ -40,12 +40,15 @@
 
 #define OFFSET_RESET 0     /* reset character offset */
 
+#define ZERO_CAPACITY 0
 #define MIN_CAPACITY 1      /* minimum character buffer capacity */
 #define FIX_INC_FACTOR 0    /* fixed increment factor constant */
 #define MIN_INC_FACTOR 1    /* minimum additive increment factor constant */
 #define MIN_MUL_INC_FACTOR 1    /* minumum multiplicative increment factor constant */
 #define MAX_ADD_INC_FACTOR 255  /* maximum additive increment factor constant */
 #define MAX_MUL_INC_FACTOR 100  /* maximum multiplicative increment factor constant */
+
+#define ERR_INC_FACTOR 256 /* return value in case of error on reading increment factor */
 
 /* user data type declarations */
 typedef struct BufferDescriptor {
@@ -69,7 +72,7 @@ void b_free(Buffer* const);
 int b_isfull(Buffer* const);
 short b_size(Buffer* const);
 short b_capacity(Buffer* const);
-short b_setmark(Buffer* const, short);
+char* b_setmark(Buffer* const, short);
 short b_mark(Buffer* const);
 int b_mode(Buffer* const);
 size_t b_incfactor(Buffer* const);
