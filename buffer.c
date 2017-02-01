@@ -332,14 +332,24 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
  * Return value: char
  */
 char b_getc(Buffer* const pBD) {
+    char char_buf;
+
     if (!pBD) { return R_FAIL2; }
+
     if (pBD->getc_offset == pBD->addc_offset) {
         pBD->eob = SET_EOB_FLAG;
         return R_FAIL1;
     } else {
         pBD->eob = UNSET_EOB_FLAG;
     }
-    return pBD->cb_head[pBD->getc_offset++];
+
+    char_buf = pBD->cb_head[pBD->getc_offset++];
+
+    if (pBD->getc_offset == pBD->addc_offset) {
+        pBD->eob = SET_EOB_FLAG;
+    }
+
+    return char_buf;
 }
 
 /* Prints the output of the buffer
@@ -366,11 +376,11 @@ int b_print(Buffer* const pBD) {
     else {
         tmp_offset = pBD->getc_offset;
         pBD->getc_offset = OFFSET_RESET;
-        do {
+        while (!b_eob(pBD)) {
             char_buf = b_getc(pBD);
             printf("%c", (char) char_buf);
             char_count++;
-        } while (!b_eob(pBD));
+        };
         printf("\n");
     }
     /* Restore the getc_offset after printing */
