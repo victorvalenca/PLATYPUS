@@ -1,9 +1,9 @@
 /* File Name: buffer.h
  * Version: 1.16.2
  * Author: S^R & Victor Fernandes
- * Date: 6 September 2016
+ * Date: 1 February 2017
  * Preprocessor directives, type declarations and prototypes necessary for buffer implementation
- * as required for CST8152, Assignment #1, Fall 2016.
+ * as required for CST8152, Assignment #1, Winter 2017.
  */
 #ifndef BUFFER_H_
 #define BUFFER_H_
@@ -14,7 +14,7 @@
 
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
-#include <malloc.h> /* for dynamic memory allocation. NOTE: USE MALLOC.H FOR LINUX/WINDOWS.THIS IS FOR MACOS ONLY*/
+#include <mm_malloc.h> /* for dynamic memory allocation. NOTE: USE MALLOC.H FOR LINUX/WINDOWS.THIS IS FOR MACOS ONLY*/
 #include <limits.h> /* implementation-defined data type ranges and limits */
 
 /* constant definitions */
