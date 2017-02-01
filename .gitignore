@@ -32,3 +32,4 @@ bld/
 ## Miscellaneous files
 *.zip
 *.exe
+/test
