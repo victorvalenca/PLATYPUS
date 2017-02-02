@@ -289,7 +289,7 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
             }
 
             avail_space = SHRT_MAX - pBD->capacity;
-            new_inc = avail_space * ((unsigned char) pBD->inc_factor / 100);
+            new_inc = avail_space * ((double) pBD->inc_factor) / 100;
 
             /* Check if there is enough space for the new increment and
             "trim" it if needed */
@@ -330,6 +330,11 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
  * Parameters:
     - pBuffer const pBD
  * Return value: char
+ * Algorithm: Function will check if getc_offset is at the end
+ * of the character array. If so, set flag and return failure.
+ * Otherwise fetch character from cb_head, increment offset, and
+ * check if it reached the EOB. If so, apply the flag before
+ * returning the character.
  */
 char b_getc(Buffer* const pBD) {
     char char_buf;
@@ -363,7 +368,7 @@ char b_getc(Buffer* const pBD) {
 int b_print(Buffer* const pBD) {
     int char_count = 0; /* Counter to track how many characters were sent to output */
     char char_buf;  /* "Buffer" character to load before output */
-    short tmp_offset = OFFSET_RESET;
+    short tmp_offset;
 
     if (!pBD || !pBD->cb_head) {
 		return R_FAIL1;
@@ -374,17 +379,19 @@ int b_print(Buffer* const pBD) {
 	}
 
     else {
+        /* Save getc_offset to restore after printing */
         tmp_offset = pBD->getc_offset;
         pBD->getc_offset = OFFSET_RESET;
-        while (!b_eob(pBD)) {
+
+        do {
             char_buf = b_getc(pBD);
             printf("%c", (char) char_buf);
             char_count++;
-        };
+        } while (!b_eob(pBD));
         printf("\n");
+        /* Restore the getc_offset */
+        pBD->getc_offset = tmp_offset;
     }
-    /* Restore the getc_offset after printing */
-    pBD->getc_offset = tmp_offset;
     return char_count;
 }
 
