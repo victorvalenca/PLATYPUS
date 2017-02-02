@@ -39,3 +39,4 @@ bld/
 *.a
 *.o
 *.out
+*.gch
