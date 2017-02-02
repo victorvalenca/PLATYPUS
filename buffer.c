@@ -7,10 +7,9 @@
  * Professor: Svillen Ranev
  * A character buffer utility with three modes of self-incrementation
  through dynamic memory allocation, and ability to set a mark flag.
- * Function list: b_create, b_addc, b_reset, b_free, b_isfull,
- * b_size, b_capacity, b_setmark, b_mark, b_mode, b_incfactor,
- * b_load, b_isempty, b_eob, b_getc, b_print, b_pack, b_rflag,
- b_retract, b_retract_to_mark, b_getcoffset, b_cbhead
+ * Function list: b_create, b_isfull, b_isempty, b_size, b_capacity,
+ b_mode, b_incfactor, b_mark, b_flag, b_getcoffset, b_cbhead, b_setmark,
+ b_eob, b_addc, b_getc, b_print, b_load, b_reset, b_retract, b_pack, b_free
  */
 
 
@@ -220,7 +219,8 @@ char* b_cbhead(Buffer* const pBD) {
     return pBD->cb_head;
 }
 
-/* Sets a mark offset on the buffer's mark flag
+/* Sets a mark offset on the buffer's mark flag and returns a pointer
+to cb_head at that offset
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
  * Called functions: N/A
@@ -349,16 +349,19 @@ char b_getc(Buffer* const pBD) {
     char char_buf;
 
     if (!pBD) { return R_FAIL2; }
-
+    /* Make sure the buffer isn't at the end of the read offset*/
     if (pBD->getc_offset == pBD->addc_offset) {
         pBD->eob = SET_EOB_FLAG;
         return R_FAIL1;
     } else {
         pBD->eob = UNSET_EOB_FLAG;
     }
-
+    /* Fetch character at read offset if EOB check passed */
     char_buf = pBD->cb_head[pBD->getc_offset++];
 
+    /* Double check if it is at EOB and set flag if needed.
+     Standard behaviour for a buffer/file stream
+    */
     if (pBD->getc_offset == pBD->addc_offset) {
         pBD->eob = SET_EOB_FLAG;
     }
@@ -423,11 +426,11 @@ int b_load(FILE* const fi, Buffer* const pBD) {
 
 	while (!feof(fi)) {
         char_buf = (char) fgetc(fi);
-		
+		/* Check loaded character if it's at the end*/
         if (char_buf == EOF) {
             break;
         }
-
+        /* Stop loading if adding a character fails */
         if (!b_addc(pBD, char_buf)) { 
             return LOAD_FAIL;
         }

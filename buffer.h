@@ -2,8 +2,13 @@
  * Version: 1.16.2
  * Author: S^R & Victor Fernandes
  * Date: 1 February 2017
- * Preprocessor directives, type declarations and prototypes necessary for buffer implementation
+ * Preprocessor directives, type declarations and prototypes 
+ necessary for buffer implementation
  * as required for CST8152, Assignment #1, Winter 2017.
+ * Function list: b_create, b_addc, b_reset, b_free, b_isfull,
+ b_size, b_capacity, b_setmark, b_mark, b_mode, b_incfactor,
+ b_load, b_isempty, b_eob, b_getc, b_print, b_pack, b_rflag,
+ b_retract, b_retract_to_mark, b_getcoffset, b_cbhead
  */
 #ifndef BUFFER_H_
 #define BUFFER_H_
@@ -14,7 +19,7 @@
 
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
-#include <mm_malloc.h> /* for dynamic memory allocation. NOTE: USE MALLOC.H FOR LINUX/WINDOWS.THIS IS FOR MACOS ONLY*/
+#include <malloc.h> /* for dynamic memory allocation.*/
 #include <limits.h> /* implementation-defined data type ranges and limits */
 
 /* constant definitions */
