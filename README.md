@@ -37,4 +37,4 @@ You can modify the initial capacity and increment factor defined in `platy_bt.c`
 - Increment factor range for additive mode: `1 - 255`. (setting this to 0 implies fixed mode, regardless of the mode given in the command line)
 - Initial capacity range (in bytes): `0 - 32767 (SHRT_MAX)`
 - This is due to my environment's install locations for the C include libraries: 
-    - **Change the `#include` statement from `mm_malloc.h` to `malloc.h`, depending on what your compiler uses. Homebrew gcc6 installs on macOS might need this, but Linux and Windows generally will use `malloc.h`**
+    - **Inside `buffer.h`, change the `#include` statement from `mm_malloc.h` to `malloc.h`, depending on what your compiler uses. Homebrew gcc6 installs on macOS might need this, but Linux and Windows generally will use `malloc.h`**
