@@ -35,6 +35,6 @@ bld/
 /test
 
 ## Object/Assembly/Linker files
-.asm
-.a
-.o
+*.asm
+*.a
+*.o
