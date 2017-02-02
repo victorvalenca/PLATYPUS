@@ -15,7 +15,13 @@ ALL = $(SRC) $(DEPS)
 
 # Object files
 OBJ = buffer.o platy_bt.o
+default: all
 
+.PHONY: all
+all:
+	make gcc
+	make clang
+	
 .PHONY : gcc
 gcc : $(ALL)
 	$(GCC) $(ALL) -o buffer_gcc
