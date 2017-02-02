@@ -73,7 +73,7 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
         free(pBD);
         return NULL;
     }
-	pBD->addc_offset = OFFSET_RESET;
+    
     pBD->capacity = init_capacity;
     /* END CONFIGURING BUFFER */
     return pBD;
@@ -123,7 +123,7 @@ int b_isempty(Buffer* const pBD) {
  */
 short b_size(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
-    return pBD->addc_offset;
+    return (unsigned short) pBD->addc_offset;
 }
 
 /* Reports the current capacity of the character buffer
@@ -278,7 +278,7 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
     pBD->r_flag = UNSET_R_FLAG;
 
     /* BEGIN BUFFER INCREMENT */
-    if (pBD->addc_offset == pBD->capacity){
+    if (pBD->addc_offset >= pBD->capacity){
         if (pBD->mode == FIX_OP_MODE) { /* Fixed mode, won't increment */
             return NULL;
         }
@@ -302,7 +302,7 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
 
             /* Check if there is enough space for the new increment and
             "trim" it if needed */
-            if (new_inc >= avail_space) {
+            if (new_inc >= avail_space || (new_inc <= MIN_CAPACITY && pBD->capacity < SHRT_MAX)) {
                 new_cap = SHRT_MAX;
             }
             else {
