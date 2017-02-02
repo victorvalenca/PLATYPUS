@@ -38,3 +38,4 @@ bld/
 *.asm
 *.a
 *.o
+*.out
