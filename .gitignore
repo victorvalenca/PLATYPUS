@@ -33,3 +33,8 @@ bld/
 *.zip
 *.exe
 /test
+
+## Object/Assembly/Linker files
+.asm
+.a
+.o
