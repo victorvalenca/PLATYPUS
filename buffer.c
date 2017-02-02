@@ -73,7 +73,7 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
         free(pBD);
         return NULL;
     }
-
+	pBD->addc_offset = OFFSET_RESET;
     pBD->capacity = init_capacity;
     /* END CONFIGURING BUFFER */
     return pBD;
@@ -165,7 +165,7 @@ int b_mode(Buffer* const pBD) {
  */
 size_t b_incfactor(Buffer* const pBD) {
 	if (!pBD) { return ERR_INC_FACTOR; }
-    return (size_t) pBD->inc_factor;
+    return (size_t)(unsigned char) pBD->inc_factor;
 }
 
 /* Reports the current position of the mark offset in the character buffer
@@ -283,7 +283,7 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
             return NULL;
         }
         else if (pBD->mode == ADD_OP_MODE) { /* Calculate new size for additive mode */
-            new_cap = pBD->capacity + pBD->inc_factor;
+            new_cap = pBD->capacity + (unsigned char) pBD->inc_factor;
             /* Make sure no short overflow happened */
             if (new_cap < MIN_CAPACITY){
                 return NULL;
@@ -295,8 +295,10 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
                 return NULL;
             }
 
+			/* msvc warns about possible loss of data when converting from double to short, this is fine 
+			because the buffer doesn't deal with floating points*/
             avail_space = SHRT_MAX - pBD->capacity;
-            new_inc = avail_space * ((double) pBD->inc_factor) / 100;
+            new_inc = (short) (avail_space * (((double) pBD->inc_factor) / 100));
 
             /* Check if there is enough space for the new increment and
             "trim" it if needed */

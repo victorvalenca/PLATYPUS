@@ -14,7 +14,7 @@
 
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
-#include <mm_malloc.h> /* for dynamic memory allocation. NOTE: USE MALLOC.H FOR LINUX/WINDOWS.THIS IS FOR MACOS ONLY*/
+#include <malloc.h> /* for dynamic memory allocation. NOTE: USE MALLOC.H FOR LINUX/WINDOWS.THIS IS FOR MACOS ONLY*/
 #include <limits.h> /* implementation-defined data type ranges and limits */
 
 /* constant definitions */
