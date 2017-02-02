@@ -1,14 +1,16 @@
 /*
  * File Name: buffer.c
- * Compiler: GCC 6.2.0
+ * Compiler: GCC 6.3.0
  * Author: Victor Fernandes, 040772243
  * Course: CST8152 - Compilers, Lab Section: 011
  * Date: February 1, 2017
  * Professor: Svillen Ranev
  * A character buffer utility with three modes of self-incrementation
  through dynamic memory allocation, and ability to set a mark flag.
- * Function list:
- * TODO: Function list and finish algorithm descriptions
+ * Function list: b_create, b_addc, b_reset, b_free, b_isfull,
+ * b_size, b_capacity, b_setmark, b_mark, b_mode, b_incfactor,
+ * b_load, b_isempty, b_eob, b_getc, b_print, b_pack, b_rflag,
+ b_retract, b_retract_to_mark, b_getcoffset, b_cbhead
  */
 
 
@@ -83,7 +85,7 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return values: -1, 0, 1
+ * Return values: -1 (R_FAIL1), 0 (FALSE), 1 (TRUE)
  */
 int b_isfull(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -100,7 +102,7 @@ int b_isfull(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: -1, 0, 1
+ * Return value: -1 (R_FAIL1), 0 (FALSE), 1 (TRUE)
  */
 int b_isempty(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -117,7 +119,7 @@ int b_isempty(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: -1 (R_FAIL1), short
  */
 short b_size(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -130,7 +132,7 @@ short b_size(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: -1 (R_FAIL1), short
  */
 short b_capacity(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -143,7 +145,10 @@ short b_capacity(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: -2, -1, 0, 1
+ * Return value: -2 (R_FAIL2),
+ *               -1 (multiplicative),
+ *                0 (fixed),
+ *                1 (additive)
  */
 int b_mode(Buffer* const pBD) {
     if (!pBD) { return R_FAIL2; }
@@ -156,7 +161,7 @@ int b_mode(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: size_t
+ * Return value: size_t, 256 (ERR_INC_FACTOR)
  */
 size_t b_incfactor(Buffer* const pBD) {
 	if (!pBD) { return ERR_INC_FACTOR; }
@@ -169,7 +174,7 @@ size_t b_incfactor(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: short, -1 (R_FAIL1)
  */
 short b_mark(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -182,7 +187,7 @@ short b_mark(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: char
+ * Return value: char, -1 (R_FAIL1)
  */
 char b_flag(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -195,7 +200,7 @@ char b_flag(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: short, -1 (R_FAIL1)
  */
 short b_getcoffset(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -208,7 +213,7 @@ short b_getcoffset(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: char*, NULL 
  */
 char* b_cbhead(Buffer* const pBD) {
     if (!pBD || !pBD->cb_head) { return NULL; }
@@ -221,7 +226,7 @@ char* b_cbhead(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: char*
+ * Return value: char*, NULL
  */
 char* b_setmark(Buffer* const pBD, short mark) {
     if (!pBD || mark < 0 || mark > pBD->addc_offset) { return NULL; }
@@ -235,7 +240,7 @@ char* b_setmark(Buffer* const pBD, short mark) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: 1, 0
+ * Return value: 1, 0, -1 (R_FAIL1)
  */
 int b_eob(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -250,8 +255,10 @@ possible and needed
  * Parameters:
     - pBuffer const pBD
     - char symbol (1-255)
- * Return value: pBuffer or NULL
- * Algorithm:
+ * Return value: pBuffer, NULL
+ * Algorithm: Function checks if the cb_head's character size reached
+ * maximum capacity and resizes if it's able (by the mode or SHRT_MAX),
+ * then adds one character to cb_head.
  */
 pBuffer b_addc(pBuffer const pBD, char symbol) {
     /* Variables used for calculating required space for reallocating cb_head
@@ -329,7 +336,7 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: char
+ * Return value: char, -2 (R_FAIL2), -1 (R_FAIL1)
  * Algorithm: Function will check if getc_offset is at the end
  * of the character array. If so, set flag and return failure.
  * Otherwise fetch character from cb_head, increment offset, and
@@ -363,7 +370,7 @@ char b_getc(Buffer* const pBD) {
  * Called functions: b_isempty(), b_getc(), b_eob(), printf()
  * Parameters:
     - pBuffer const pBD
- * Return value: int
+ * Return value: int, -1 (R_FAIL1)
  */
 int b_print(Buffer* const pBD) {
     int char_count = 0; /* Counter to track how many characters were sent to output */
@@ -402,7 +409,7 @@ int b_print(Buffer* const pBD) {
  * Parameters:
     - FILE* const fi
     - pBuffer const pBD
- * Return value: int
+ * Return value: int, -1 (R_FAIL1), -2 (LOAD_FAIL)
  */
 int b_load(FILE* const fi, Buffer* const pBD) {
     char char_buf; /* "Buffer" character to be loaded before adding to cb_head */
@@ -434,7 +441,7 @@ int b_load(FILE* const fi, Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: int
+ * Return value: 1 (TRUE), -1 (R_FAIL1)
  */
 int b_reset(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -453,13 +460,13 @@ int b_reset(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: short, -1 (R_FAIL1)
  */
 short b_retract_to_mark(Buffer* const pBD) {
     /* Check if any offsets are out of bounds */
     if(!pBD ||
-        pBD->getc_offset < OFFSET_RESET || pBD->getc_offset > pBD->capacity ||
-        pBD->mark_offset < OFFSET_RESET || pBD->mark_offset > pBD->capacity) {
+        pBD->mark_offset < OFFSET_RESET || 
+        pBD->mark_offset > pBD->capacity){
         return R_FAIL1;
     }
     pBD->getc_offset = pBD->mark_offset;
@@ -472,7 +479,7 @@ short b_retract_to_mark(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: short
+ * Return value: short, -1 (R_FAIL1)
  */
 short b_retract(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -487,7 +494,7 @@ short b_retract(Buffer* const pBD) {
  * Called functions: N/A
  * Parameters:
     - pBuffer const pBD
- * Return value: char
+ * Return value: char, -1 (R_FAIL1)
  */
 char b_rflag(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
@@ -513,6 +520,10 @@ Buffer* b_pack(Buffer* const pBD) {
 
     /* Configure new capacity value */
     new_cap = pBD->addc_offset + 1;
+
+    /* Avoid buffer destruction from overflow */
+    if (new_cap <= 0) { return NULL;}
+
     old_addr = pBD->cb_head;
 
     /* Reallocate cb_head to new size */
