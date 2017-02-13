@@ -206,19 +206,6 @@ short b_getcoffset(Buffer* const pBD) {
     return pBD->getc_offset;
 }
 
-/* Returns the buffer's actual character buffer address
- * Author: Victor Fernandes, 040772243
- * Version: 0.0.1
- * Called functions: N/A
- * Parameters:
-    - pBuffer const pBD
- * Return value: char*, NULL 
- */
-char* b_cbhead(Buffer* const pBD) {
-    if (!pBD || !pBD->cb_head) { return NULL; }
-    return pBD->cb_head;
-}
-
 /* Sets a mark offset on the buffer's mark flag and returns a pointer
 to cb_head at that offset
  * Author: Victor Fernandes, 040772243
@@ -278,14 +265,14 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
     pBD->r_flag = UNSET_R_FLAG;
 
     /* BEGIN BUFFER INCREMENT */
-    if (pBD->addc_offset >= pBD->capacity){
+    if (pBD->addc_offset == pBD->capacity){
         if (pBD->mode == FIX_OP_MODE) { /* Fixed mode, won't increment */
             return NULL;
         }
         else if (pBD->mode == ADD_OP_MODE) { /* Calculate new size for additive mode */
             new_cap = pBD->capacity + (unsigned char) pBD->inc_factor;
             /* Make sure no short overflow happened */
-            if (new_cap < MIN_CAPACITY){
+            if (new_cap < ZERO_CAPACITY){
                 return NULL;
             }
 
@@ -301,8 +288,9 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
             new_inc = (short) (avail_space * (((double) pBD->inc_factor) / 100));
 
             /* Check if there is enough space for the new increment and
-            "trim" it if needed */
-            if (new_inc >= avail_space || (new_inc <= MIN_CAPACITY && pBD->capacity < SHRT_MAX)) {
+            "trim" it if needed*/
+			/* Note: If the available space is 1 or 0, new_inc will evaluate to 0 (after truncation) */
+            if (new_inc == ZERO_CAPACITY) {
                 new_cap = SHRT_MAX;
             }
             else {
@@ -312,7 +300,7 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
 
         /* Reallocate memory to character buffer */
         old_addr = pBD->cb_head; /* Keep track of old pointer address to check if it changed */
-        tmp_addr = (char *)realloc(pBD->cb_head, sizeof(char) * new_cap);
+        tmp_addr = (char *)realloc(pBD->cb_head, sizeof(char) * (unsigned short) new_cap);
         
         if (tmp_addr == NULL){
             return NULL; /* Abort everything if allocation fails */
@@ -321,13 +309,12 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
         pBD->cb_head = tmp_addr;
         pBD->capacity = new_cap;
         if (old_addr == pBD->cb_head) { /* Compare the old and new addresses and set flag appropriately */
-            pBD->r_flag = SET_R_FLAG;
+            pBD->r_flag = (pBD->cb_head == tmp_addr);
         }
     } /* END BUFFER INCREASE */
 
     /* Finally, add new symbol to the buffer after increasing it (or not) */
-    pBD->cb_head[pBD->addc_offset] = symbol;
-    pBD->addc_offset++;
+    pBD->cb_head[pBD->addc_offset++] = symbol;
     return pBD;
 
 }

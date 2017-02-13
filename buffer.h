@@ -91,6 +91,5 @@ char b_rflag(Buffer* const);
 short b_retract(Buffer* const);
 short b_retract_to_mark(Buffer* const);
 short b_getcoffset(Buffer* const);
-char* b_cbhead(Buffer* const);
 
 #endif
