@@ -548,6 +548,8 @@ Buffer* b_pack(Buffer* const pBD) {
  * Return value: N/A
  */
 void b_free(Buffer* const pBD) {
-    free(pBD->cb_head);
-    free(pBD);
+    if (pBD){
+        free(pBD->cb_head);
+        free(pBD);
+    }
 }
