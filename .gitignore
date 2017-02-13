@@ -40,3 +40,7 @@ bld/
 *.o
 *.out
 *.gch
+*.vcxproj
+*.filters
+*.db
+*.opendb

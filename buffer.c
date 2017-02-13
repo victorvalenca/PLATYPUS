@@ -36,7 +36,7 @@ Buffer* b_create(short init_capacity, char inc_factor, char o_mode) {
     /* BEGIN CONFIGURING BUFFER */
 
     /* Check if init_capacity is within acceptable range */
-    if (init_capacity <= ZERO_CAPACITY) {
+    if (init_capacity < ZERO_CAPACITY) {
         return NULL;
     }
     /* Leaving cb_head allocation for last in the event of bad input */
@@ -332,7 +332,6 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
  * returning the character.
  */
 char b_getc(Buffer* const pBD) {
-    char char_buf;
 
     if (!pBD) { return R_FAIL2; }
     /* Make sure the buffer isn't at the end of the read offset*/
