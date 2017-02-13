@@ -244,7 +244,7 @@ char* b_setmark(Buffer* const pBD, short mark) {
  */
 int b_eob(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
-    return pBD->eob;
+    return (unsigned int) pBD->eob;
 }
 
 /* Adds one character symbol to the character buffer, incrementing its size if
@@ -353,20 +353,12 @@ char b_getc(Buffer* const pBD) {
     if (pBD->getc_offset == pBD->addc_offset) {
         pBD->eob = SET_EOB_FLAG;
         return R_FAIL1;
-    } else {
-        pBD->eob = UNSET_EOB_FLAG;
     }
+
+    pBD->eob = UNSET_EOB_FLAG;
     /* Fetch character at read offset if EOB check passed */
-    char_buf = pBD->cb_head[pBD->getc_offset++];
+    return pBD->cb_head[pBD->getc_offset++];
 
-    /* Double check if it is at EOB and set flag if needed.
-     Standard behaviour for a buffer/file stream
-    */
-    if (pBD->getc_offset == pBD->addc_offset) {
-        pBD->eob = SET_EOB_FLAG;
-    }
-
-    return char_buf;
 }
 
 /* Prints the output of the buffer
@@ -394,9 +386,9 @@ int b_print(Buffer* const pBD) {
         /* Save getc_offset to restore after printing */
         tmp_offset = pBD->getc_offset;
         pBD->getc_offset = OFFSET_RESET;
-
         do {
             char_buf = b_getc(pBD);
+            if (b_eob(pBD)) { break; }
             printf("%c", (char) char_buf);
             char_count++;
         } while (!b_eob(pBD));
@@ -414,6 +406,7 @@ int b_print(Buffer* const pBD) {
  * Parameters:
     - FILE* const fi
     - pBuffer const pBD
+     * Return value: int, -1 
  * Return value: int, -1 (R_FAIL1), -2 (LOAD_FAIL)
  */
 int b_load(FILE* const fi, Buffer* const pBD) {
@@ -427,7 +420,7 @@ int b_load(FILE* const fi, Buffer* const pBD) {
 	while (!feof(fi)) {
         char_buf = (char) fgetc(fi);
 		/* Check loaded character if it's at the end*/
-        if (char_buf == EOF) {
+        if (feof(fi)) {
             break;
         }
         /* Stop loading if adding a character fails */
