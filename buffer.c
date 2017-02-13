@@ -177,7 +177,7 @@ size_t b_incfactor(Buffer* const pBD) {
  */
 short b_mark(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
-    return pBD->mark_offset;
+    return pBD->mark_coffset;
 }
 
 /* Reports if the character buffer's memory space was relocated after resizing
@@ -217,8 +217,8 @@ to cb_head at that offset
  */
 char* b_setmark(Buffer* const pBD, short mark) {
     if (!pBD || mark < 0 || mark > pBD->addc_offset) { return NULL; }
-    pBD->mark_offset = mark;
-    return (pBD->cb_head) + pBD->mark_offset;
+    pBD->mark_coffset = mark;
+    return (pBD->cb_head) + pBD->mark_coffset;
 }
 
 /* Reports the end-of-buffer flag state of the character buffer
@@ -308,9 +308,8 @@ pBuffer b_addc(pBuffer const pBD, char symbol) {
 
         pBD->cb_head = tmp_addr;
         pBD->capacity = new_cap;
-        if (old_addr == pBD->cb_head) { /* Compare the old and new addresses and set flag appropriately */
-            pBD->r_flag = (pBD->cb_head == tmp_addr);
-        }
+		/* Compare the old and new addresses and set flag appropriately */
+        pBD->r_flag = (pBD->cb_head == old_addr);
     } /* END BUFFER INCREASE */
 
     /* Finally, add new symbol to the buffer after increasing it (or not) */
@@ -433,7 +432,7 @@ int b_reset(Buffer* const pBD) {
 
     pBD->addc_offset = OFFSET_RESET;
     pBD->getc_offset = OFFSET_RESET;
-    pBD->mark_offset = OFFSET_RESET;
+    pBD->mark_coffset = OFFSET_RESET;
     pBD->eob = UNSET_EOB_FLAG;
 	pBD->r_flag = UNSET_R_FLAG;
     return TRUE;
@@ -450,11 +449,11 @@ int b_reset(Buffer* const pBD) {
 short b_retract_to_mark(Buffer* const pBD) {
     /* Check if any offsets are out of bounds */
     if(!pBD ||
-        pBD->mark_offset < OFFSET_RESET || 
-        pBD->mark_offset > pBD->capacity){
+        pBD->mark_coffset < OFFSET_RESET || 
+        pBD->mark_coffset > pBD->capacity){
         return R_FAIL1;
     }
-    pBD->getc_offset = pBD->mark_offset;
+    pBD->getc_offset = pBD->mark_coffset;
     return pBD->getc_offset;
 }
 
@@ -520,9 +519,8 @@ Buffer* b_pack(Buffer* const pBD) {
     pBD->capacity = new_cap;
 
     /* Compare old and new addresses and set R_FLAG accordingly */
-    if (old_addr != pBD->cb_head){
-        pBD->r_flag = SET_R_FLAG;
-    }
+    pBD->r_flag = (pBD->cb_head == old_addr);
+
     return pBD;
 }
 
