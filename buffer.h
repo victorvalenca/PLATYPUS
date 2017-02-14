@@ -19,7 +19,7 @@
 
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
-#include <malloc.h> /* for dynamic memory allocation.*/
+#include <mm_malloc.h> /* for dynamic memory allocation.*/
 #include <limits.h> /* implementation-defined data type ranges and limits */
 
 /* constant definitions */
@@ -61,7 +61,7 @@ typedef struct BufferDescriptor {
     short capacity;    /* current dynamic memory size (in bytes) allocated to character buffer */
     short addc_offset;  /* the offset (in chars) to the add-character location */
     short getc_offset;  /* the offset (in chars) to the get-character location */
-    short mark_coffset; /* the offset (in chars) to the mark location */
+    short mark_offset; /* the offset (in chars) to the mark location */
     char  inc_factor; /* character array increment factor */
     char  r_flag;     /* reallocation flag */
     char  mode;       /* operational mode indicator*/
@@ -91,5 +91,6 @@ char b_rflag(Buffer* const);
 short b_retract(Buffer* const);
 short b_retract_to_mark(Buffer* const);
 short b_getcoffset(Buffer* const);
+char* b_cbhead(Buffer* const);
 
 #endif
