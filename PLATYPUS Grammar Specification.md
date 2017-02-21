@@ -238,7 +238,8 @@
         | <logical OR expression> .OR. <relational expression>
 
     <logical AND expression> ->
-        <logical AND expression> .AND. <relational expression>
+        <relational expression>
+        | <logical AND expression> .AND. <relational expression>
 // END BNF from C specification
 
 
