@@ -123,6 +123,9 @@
     + - * /
 
 <string concatenation operator> -> one of
+    <<
+    
+<relational operator> -> one of
     > < == <>
 
 <logical operator> ->
