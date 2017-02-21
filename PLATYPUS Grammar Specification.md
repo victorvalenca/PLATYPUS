@@ -124,7 +124,7 @@
 
 <string concatenation operator> -> one of
     <<
-    
+
 <relational operator> -> one of
     > < == <>
 
@@ -255,16 +255,8 @@
 #### 3.3.4 Relational Expression
 ```
 <relational expression> ->
-    <primary a_relational expression> == <primary a_relational expression>
-    | <primary a_relational expression> <= <primary a_relational expression>
-    | <primary a_relational expression> >= <primary a_relational expression>
-    | <primary a_relational expression> > <primary a_relational expression>
-    | <primary a_relational expression> < <primary a_relational expression>
-    | <primary s_relational expression> == <primary s_relational expression>
-    | <primary s_relational expression> <= <primary s_relational expression>
-    | <primary s_relational expression> >= <primary s_relational expression>
-    | <primary s_relational expression> > <primary s_relational expression>
-    | <primary s_relational expression> < <primary s_relational expression>
+    <primary a_relational expression> <relational operator> <primary a_relational expression>
+    | <primary s_relational expression> <relational operator> <primary s_relational expression>
 
 <primary a_relational expression> ->
     <floating-point literal>
