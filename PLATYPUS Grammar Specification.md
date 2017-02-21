@@ -161,13 +161,13 @@
 #### 3.2.2 Selection Statement (`if` statement)
 ```
 <selection statement> ->
-    IF (<conditional expression>) THEN <statements>
+    IF (<conditional expression>) THEN <opt_statements>
     ELSE {<opt_statements>};
 ```
 #### 3.2.3 Iteration Statement (the loop statement)
 ```
 <iteration statement> ->
-    <TBC>
+    USING (<assignment expression> , <conditional expression>, <assignment expression>) REPEAT { <opt_statements> };
 ```
 #### 3.2.4 Input Statement
 ```
@@ -180,7 +180,7 @@
 #### 3.2.5 Output Statement
 ```
 <output statement> ->
-    <TBC>
+    OUTPUT(<opt_variable list> | <opt_string literal>);
 ```
 ### 3.3 Expressions
 #### 3.3.1 Arithmetic Expressions
@@ -222,23 +222,27 @@
 #### 3.3.3 Conditional Expression
 ```
 <conditional expression> ->
-    <logical OR expression>
+    <conditional expression>
+    | <logical AND expression>
+    | <logical OR expression>
 
 <logical OR expression> ->
-    <TBC>
+    <relational expression> .OR. <relational expression>
 
 <logical AND expression> ->
-    <TBC>
+    <relational expression> .AND. <relational expression>
 ```
 #### 3.3.4 Relational Expression
 ```
 <relational expression> ->
     <primary a_relational expression> == <primary a_relational expression>
     | <primary a_relational expression> <= <primary a_relational expression>
+    | <primary a_relational expression> >= <primary a_relational expression>
     | <primary a_relational expression> > <primary a_relational expression>
     | <primary a_relational expression> < <primary a_relational expression>
     | <primary s_relational expression> == <primary s_relational expression>
     | <primary s_relational expression> <= <primary s_relational expression>
+    | <primary s_relational expression> >= <primary s_relational expression>
     | <primary s_relational expression> > <primary s_relational expression>
     | <primary s_relational expression> < <primary s_relational expression>
 
@@ -248,5 +252,6 @@
     | <variable identifier>
 
 <primary s_relational expression> ->
-    <TBC>
+    <string variable identifier>
+    | <string literal>
 ```
