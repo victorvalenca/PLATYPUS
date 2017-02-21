@@ -82,7 +82,7 @@
     0 | <non-zero digit>
 
 <non-zero digit> -> one of
-    [1-9]
+    1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
 <octal integer literal> ->
     0 <octal digit> <octal digits>
@@ -109,8 +109,8 @@
 ```
 ### 2.9 Separators
 ```
-<separator> -> one of
-    ( ) { } , ; " .
+<separator> ->
+    ( | ) | { | } | , | ; | " |.
 ```
 ### 2.10 Operators
 ```
@@ -119,14 +119,14 @@
     | <relational operator> | <logical operator>
     | <assignment operator>
 
-<arithmetic operator> -> one of
-    + - * /
+<arithmetic operator> ->
+    + | - | * | /
 
-<string concatenation operator> -> one of
+<string concatenation operator> ->
     <<
 
-<relational operator> -> one of
-    > < == <>
+<relational operator> ->
+    > | < | == | <>
 
 <logical operator> ->
     .AND. | .OR.
@@ -224,12 +224,6 @@
 ```
 #### 3.3.3 Conditional Expression
 ```
-<conditional expression> ->
-    <conditional expression>
-    | <logical AND expression>
-    | <logical OR expression>
-
-
 // BNF from C specification 
 // (translated to PLATYPUS because it does not implement all of C's grammar)
 // source: https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm
@@ -244,13 +238,6 @@
         <relational expression>
         | <logical AND expression> .AND. <relational expression>
 // END BNF from C specification
-
-
-<logical OR expression> ->
-    <relational expression> .OR. <relational expression>
-
-<logical AND expression> ->
-    <relational expression> .AND. <relational expression>
 ```
 #### 3.3.4 Relational Expression
 ```
