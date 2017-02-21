@@ -226,6 +226,22 @@
     | <logical AND expression>
     | <logical OR expression>
 
+
+// BNF from C specification 
+// (translated to PLATYPUS because it does not implement all of C's grammar)
+// source: https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm
+    <conditional expression> ->
+        <logical OR expression>
+
+    <logical OR expression> ->
+        <logical AND expression>
+        | <logical OR expression> .OR. <relational expression>
+
+    <logical AND expression> ->
+        <logical AND expression> .AND. <relational expression>
+// END BNF from C specification
+
+
 <logical OR expression> ->
     <relational expression> .OR. <relational expression>
 
