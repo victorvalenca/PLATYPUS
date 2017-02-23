@@ -157,7 +157,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 ### 3.3 Assignment Statement
 ```
 <assignment statement> ->
-    <assignment expression>
+    <assignment expression> ;
 
 <assignment expression> ->
     <arithmetic variable identifier> = <arithmetic expression>
@@ -226,8 +226,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 ```
 #### 3.3.3 Conditional Expression
 ```
-// BNF from C specification 
-// (adapted to PLATYPUS specification because it does not implement all of C's grammar)
+// BNF from C specification adapted to PLATYPUS
 // source: https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm
     <conditional expression> ->
         <logical OR expression>
