@@ -2,7 +2,9 @@
 
 ## 2. Lexical Specification (INCOMPLETE)
 
-## NOTE: **This is incredibly incomplete and broken, I am simply writing this down and will fix it as I read along the informal language specification provided to me**
+## NOTE: 
+**This is incomplete, I am simply writing this down and will fix it as I read along the informal language specification provided to me
+This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all the definitions correct and complete.**
 
 ### 2.1 Input Elements and Tokens
 ```
@@ -134,7 +136,7 @@
 <assignment operator> ->
     =
 ```
-## 3. The PLATYPUS Syntatic Specification
+## 3. The PLATYPUS Syntactic Specification
 ### 3.1 PLATYPUS Program
 ```
 <program> ->
@@ -158,8 +160,8 @@
     <assignment expression>
 
 <assignment expression> ->
-    AVID = <arithmetic expression>
-    | SVID = <string expression>
+    <arithmetic variable identifier> = <arithmetic expression>
+    | <string variable identifier> = <string expression>
 ```
 #### 3.2.2 Selection Statement (`if` statement)
 ```
@@ -225,14 +227,14 @@
 #### 3.3.3 Conditional Expression
 ```
 // BNF from C specification 
-// (translated to PLATYPUS because it does not implement all of C's grammar)
+// (adapted to PLATYPUS specification because it does not implement all of C's grammar)
 // source: https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm
     <conditional expression> ->
         <logical OR expression>
 
     <logical OR expression> ->
         <logical AND expression>
-        | <logical OR expression> .OR. <relational expression>
+        | <logical OR expression> .OR. <logical AND expression>
 
     <logical AND expression> ->
         <relational expression>
@@ -251,6 +253,6 @@
     | <variable identifier>
 
 <primary s_relational expression> ->
-    <string variable identifier>
-    | <string literal>
+    <string literal>
+    | <string variable identifier>
 ```
