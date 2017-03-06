@@ -5,8 +5,8 @@
  *    scanner_init() must be called before using the scanner.
  *    The file is incomplete;
  *    Provided by: Svillen Ranev
- *    Version: 1.16.02
- *    Date: 29 September 2016
+ *    Version: 1.17.1
+ *    Date: 30 January 2017
  *******************************************************************
  *    REPLACE THIS HEADER WITH YOUR HEADER
  *******************************************************************
@@ -66,7 +66,7 @@ int scanner_init(Buffer * sc_buf) {
 /*   scerrnum = 0;  *//*no need - global ANSI C */
 }
 
-Token mlwpar_next_token(Buffer * sc_buf)
+Token malar_next_token(Buffer * sc_buf)
 {
    Token t; /* token to return after recognition */
    unsigned char c; /* input symbol */
@@ -290,7 +290,7 @@ WHEN CALLED THE FUNCTION MUST
    IF THE lexeme IS LONGER than VID_LEN characters,
    ONLY FIRST VID_LEN-1 CHARACTERS ARE STORED
    INTO THE VARIABLE ATTRIBUTE ARRAY vid_lex[],
-   AND THEN THE % CHARACTER IS APPENDED TO THE NAME.
+   AND THEN THE # CHARACTER IS APPENDED TO THE NAME.
    ADD \0 AT THE END TO MAKE A C-type STRING.
   
   return t;
@@ -305,22 +305,24 @@ WHICH IS THE ATTRIBUTE FOR THE TOKEN.
 THE VALUE MUST BE IN THE SAME RANGE AS the value of 4-byte float in C.
 IN CASE OF ERROR (OUT OF RANGE) THE FUNCTION MUST RETURN ERROR TOKEN
 THE ERROR TOKEN ATTRIBUTE IS  lexeme. IF THE ERROR lexeme IS LONGER
-than ERR_LEN caharacters, only the first ERR_LEN character are
-stored in err_lex.
+than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
+STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
+err_lex C-type string. 
   return t;
 }
 
-ACCEPTING FUNCTION FOR THE integer literal(IL) - decimal constant (DIL) AND ZERO (0)
+ACCEPTING FUNCTION FOR THE integer literal(IL) - decimal constant (DIL)
 
 Token aa_funcXX(char lexeme[]){
 
-THE FUNCTION MUST CONVERT THE LEXEME REPRESENTING A DECIMAL CONSTANT AND 0
+THE FUNCTION MUST CONVERT THE LEXEME REPRESENTING A DECIMAL CONSTANT
 TO A DECIMAL INTEGER VALUE, WHICH IS THE ATTRIBUTE FOR THE TOKEN.
 THE VALUE MUST BE IN THE SAME RANGE AS the value of 2-byte integer in C.
 IN CASE OF ERROR (OUT OF RANGE) THE FUNCTION MUST RETURN ERROR TOKEN
 THE ERROR TOKEN ATTRIBUTE IS  lexeme. IF THE ERROR lexeme IS LONGER
-than ERR_LEN caharacters, only the first ERR_LEN character are
-stored in err_lex.
+than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
+STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
+err_lex C-type string. 
   return t;
 }
 
@@ -338,8 +340,9 @@ THE FUNCTION atool(char * lexeme) WHICH CONVERTS AN ASCII STRING
 REPRESENTING AN OCTAL NUMBER TO INTEGER VALUE
 IN CASE OF ERROR (OUT OF RANGE) THE FUNCTION MUST RETURN ERROR TOKEN
 THE ERROR TOKEN ATTRIBUTE IS  lexeme. IF THE ERROR lexeme IS LONGER
-than ERR_LEN caharacters, only the first ERR_LEN character are
-stored in err_lex.
+than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
+STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
+err_lex C-type string. 
 
   return t;
 }
@@ -350,9 +353,10 @@ Token aa_funcXX(char lexeme[]){
 
 THE FUNCTION SETS THE ERROR TOKEN. lexeme[] CONTAINS THE ERROR
 THE ATTRIBUTE OF THE ERROR TOKEN IS THE lexeme ITSELF
-AND IT MUST BE STORED in err_lex.  IF THE ERROR lexeme IS LONGER
-than ERR_LEN caharacters, only the first ERR_LEN character are
-stored in err_lex.
+AND IT MUST BE STORED in err_lex. IF THE ERROR lexeme IS LONGER
+than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
+STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
+err_lex C-type string. 
 
   return t;
 }

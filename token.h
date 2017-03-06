@@ -1,8 +1,8 @@
 /* Filename: token.h
  * Token declarations necessary for the scanner implementation 
  * CST8152, Assignment #2
- * Version: 1.16.02
- * Date: 29 September 2016
+ * Version: 1.17.1
+ * Date: 30 January 2017
  * Provided by: Svillen Ranev
  * The file is complete and MUST NOT be modified. 
  */
@@ -52,17 +52,17 @@ typedef enum LogicalOperators     {AND,OR} Log_Op;
 /* Structure declaring the token and its attributes */
 
 typedef union TokenAttribute{
-    int get_int;      /* integer attributes accessor */
-    Arr_Op arr_op;    /* arithmetic operator attribute code */
-    Rel_Op rel_op;    /* relational operator attribute code */
-    Log_Op log_op;    /* logical operator attribute code */
-    int int_value;    /* integer literal attribute (value) */
-    int kwt_idx;      /* keyword index in the keyword table */	  
-    short str_offset; /* sring literal offset from the beginning of */
-	              /* the string literal buffer (str_LTBL->cb_head) */
-    float flt_value;  /* floating-point literal attribute (value) */
-    char vid_lex[VID_LEN+1]; /* variable identifier token attribute */
-    char err_lex[ERR_LEN+1]; /* error token attribite */
+   int get_int;      /* integer attributes accessor */
+   Arr_Op arr_op;    /* arithmetic operator attribute code */
+   Rel_Op rel_op;    /* relational operator attribute code */
+   Log_Op log_op;    /* logical operator attribute code */
+   int int_value;    /* integer literal attribute (value) */
+   int kwt_idx;      /* keyword index in the keyword table */	  
+   short str_offset; /* sring literal offset from the beginning of */
+	             /* the string literal buffer (str_LTBL->cb_head) */
+   float flt_value;    /* floating-point literal attribute (value) */
+   char vid_lex[VID_LEN+1]; /* variable identifier token attribute */
+   char err_lex[ERR_LEN+1]; /* error token attribite */
   } TA;
 
 typedef struct Token

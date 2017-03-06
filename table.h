@@ -1,8 +1,8 @@
 /* Filename: table.h
  * Transition Table and function declarations necessary for the scanner implementation  
  * as required for CST8152 - Assignment #2.
- * Version: 1.16.02
- * Date: 29 September 2016
+ * Version: 1.17.1
+ * Date: 30 January 2017
  * Provided by: Svillen Ranev
  * The file is incomplete. You are to complete it.
  ***************************************************
@@ -29,7 +29,7 @@
  *  in the token-driven part of the scanner
  *  '=' , ' ' , '(' , ')' , '{' , '}' , == , <> , '>' , '<' ,
  *       space
- *  !<comment , ',' , '"' , ';' , '-' , '+' , '*' , '/', # ,
+ *  !<comment , ',' , '"' , ';' , '-' , '+' , '*' , '/', << ,
  *  .AND., .OR. , SEOF, 'wrong symbol',
  */
  
