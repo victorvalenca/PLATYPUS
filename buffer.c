@@ -217,8 +217,8 @@ to cb_head at that offset
  */
 char* b_setmark(Buffer* const pBD, short mark) {
     if (!pBD || mark < 0 || mark > pBD->addc_offset) { return NULL; }
-    pBD->mark_coffset = mark;
-    return (pBD->cb_head) + pBD->mark_coffset;
+    pBD->mark_offset = mark;
+    return (pBD->cb_head) + pBD->mark_offset;
 }
 
 /* Reports the end-of-buffer flag state of the character buffer

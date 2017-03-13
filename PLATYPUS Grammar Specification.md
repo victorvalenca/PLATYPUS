@@ -58,11 +58,11 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 <letters or digits> ::=
     <letter or digit> | <letters or digits> <letter or digit>
 
-<letter> ::= one of
-    [a-z][A-Z]
+<letter> ::= 
+    [a-z] | [A-Z]
 
-<letter or digit> ::= one of
-    [a-z][A-Z][0-9]
+<letter or digit> ::= 
+    <letter> | <digit>
 
 <string variable identifier> ::=
     <arithmetic variable identifier># 
