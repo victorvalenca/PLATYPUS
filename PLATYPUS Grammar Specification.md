@@ -52,6 +52,9 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 <arithmetic identifier> ::=
     <letter> <opt_letters or digits>
 
+<opt_letters or digits> ::=
+    ε | <letters or digits>
+
 <letters or digits> ::=
     <letter or digit> | <letters or digits> <letter or digit>
 
@@ -76,6 +79,9 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 
 <decimal integer literal> ::=
     0 | <non-zero digit> <opt_digits>
+
+<opt_digits> ::=
+    ε | <digits>
 
 <digits> ::=
     <digit> | <digits> <digit>
@@ -103,10 +109,16 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 ```
 ### 2.8 String Literals
 ```
+<opt_string literal> ::=
+    ε | <string literal>
+    
 <string literal> ::=
     "<opt_string characters>"
 
-<string chacters> ::=
+<opt_string characters> ::=
+    ε | <string characters>
+
+<string characters> ::=
     <input character> | <string characters> <input character>
 ```
 ### 2.9 Separators
@@ -141,6 +153,9 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 ```
 <program> ::=
     PLATYPUS {<opt_statements>} SEOF
+
+<opt_statements> ::=
+    ε | <statements>
 
 <statements> ::=
     <statement> | <statements> <statement>
@@ -178,6 +193,9 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 ```
 <input statement> ::=
     INPUT (<variable list>);
+
+<opt_variable list> ::=
+    ε | <variable list>
 
 <variable list> ::=
     <variable identifier> | <variable list>,<variable identifier>
