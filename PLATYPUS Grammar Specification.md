@@ -22,7 +22,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     | <integer literal> | <string literal> | <separator> | <operator>
 ```
 ### 2.2 White Space
-```
+``` bnf
 <white space> ::=
     ASCII SP character (space)
     | ASCII HT character (horizontal tab)
@@ -34,7 +34,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     CR | LF | CR LF
 ```
 ### 2.3 Comments
-```
+``` bnf
 <comment> ::=
     !< <opt_characters in line> <line terminator>
 
@@ -45,7 +45,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     <input character> but not <line terminator>
 ```
 ### 2.4 Variable Identifiers
-```
+``` bnf
 <variable identifier> ::=
     <arithmetic variable identifier> | <string variable identifier>
 
@@ -68,12 +68,12 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     <arithmetic variable identifier># 
 ```
 ### 2.5 Keywords
-```
+``` bnf
 <keyword> ::=
     PLATYPUS | IF | THEN | ELSE | USING | REPEAT | INPUT | OUTPUT
 ```
 ### 2.6 Integer Literals
-```
+``` bnf
 <integer literal> ::=
     <decimal integer literal> | <octal integer literal>
 
@@ -103,15 +103,15 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 
 ```
 ### 2.7 Floating-point Literals
-```
+``` bnf
 <floating-point literal> ::=
     <decimal integer literal> . <opt_digits>
 ```
 ### 2.8 String Literals
-```
+``` bnf
 <opt_string literal> ::=
     ε | <string literal>
-    
+
 <string literal> ::=
     "<opt_string characters>"
 
@@ -122,12 +122,12 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     <input character> | <string characters> <input character>
 ```
 ### 2.9 Separators
-```
+``` bnf
 <separator> ::=
     ( | ) | { | } | , | ; | " |.
 ```
 ### 2.10 Operators
-```
+``` bnf
 <operator> ::=
     <arithmetic operator> | <string concatenation operator>
     | <relational operator> | <logical operator>
@@ -150,7 +150,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 ```
 ## 3. The PLATYPUS Syntactic Specification
 ### 3.1 PLATYPUS Program
-```
+``` bnf
 <program> ::=
     PLATYPUS {<opt_statements>} SEOF
 
@@ -161,7 +161,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     <statement> | <statements> <statement>
 ```
 ### 3.2 Statements
-```
+``` bnf
 <statement> ::=
     <assignment statement>
     | <selection statement>
@@ -170,7 +170,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     | <output statement>
 ```
 ### 3.3 Assignment Statement
-```
+``` bnf
 <assignment statement> ::=
     <assignment expression> ;
 
@@ -179,18 +179,18 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     | <string variable identifier> = <string expression>
 ```
 #### 3.2.2 Selection Statement (`if` statement)
-```
+``` bnf
 <selection statement> ::=
     IF (<conditional expression>) THEN <opt_statements>
     ELSE {<opt_statements>};
 ```
 #### 3.2.3 Iteration Statement (the loop statement)
-```
+``` bnf
 <iteration statement> ::=
     USING (<assignment expression> , <conditional expression>, <assignment expression>) REPEAT { <opt_statements> };
 ```
 #### 3.2.4 Input Statement
-```
+``` bnf
 <input statement> ::=
     INPUT (<variable list>);
 
@@ -201,13 +201,13 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     <variable identifier> | <variable list>,<variable identifier>
 ```
 #### 3.2.5 Output Statement
-```
+``` bnf
 <output statement> ::=
     OUTPUT(<opt_variable list> | <opt_string literal>);
 ```
 ### 3.3 Expressions
 #### 3.3.1 Arithmetic Expressions
-```
+``` bnf
 <arithmetic expression> ::=
     <unary arithmetic expression>
     | <additive arithmetic expression>
@@ -233,7 +233,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     | (<arithmetic expression>)
 ```
 #### 3.3.2 String Expression
-```
+``` bnf
 <string expression> ::=
     <primary string expression>
     | <string expression> << <primary string expression>
@@ -243,7 +243,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
     | <string literal>
 ```
 #### 3.3.3 Conditional Expression
-```
+``` bnf
 // BNF from C specification adapted to PLATYPUS
 // source: https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm
     <conditional expression> ::=
@@ -259,7 +259,7 @@ This does not follow standard BNF/EBNF syntax, I will rewrite it once I get all 
 // END BNF from C specification
 ```
 #### 3.3.4 Relational Expression
-```
+``` bnf
 <relational expression> ::=
     <primary a_relational expression> <relational operator> <primary a_relational expression>
     | <primary s_relational expression> <relational operator> <primary s_relational expression>
