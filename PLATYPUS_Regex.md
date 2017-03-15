@@ -23,7 +23,6 @@ L(SVID) = AVID#
 ```
 ## Integer Literals
 ```
-
 L(DIL) = 0 | [1-9]*
 
 L(NzD) = [1-9]
