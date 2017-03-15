@@ -116,13 +116,14 @@ which is being processed by the scanner.
 			case '/': t.code = ART_OP_T; t.attribute.arr_op = DIV; return t; /* Devision operator */
 			case '>': t.code = REL_OP_T; t.attribute.rel_op = GT; return t; /* Greater-than relational operator */
 			case '<':
+				/* MSVC will complain about this assignment inside a conditional expression*/
 				if (c = b_getc(sc_buf) == '>') {
 					t.code = REL_OP_T;
 					t.attribute.rel_op = NE; /* Negation operator */
 					return t;
 				}
 				else if (c == '<') {
-					t.code == SCC_OP_T; /* String concatenation operator */
+					t.code = SCC_OP_T; /* String concatenation operator */
 				}
 				else {
 					t.code = REL_OP_T;
@@ -441,6 +442,7 @@ Token aa_func02(char lexeme[]) {
 		break;
 	default:
 		/* Floating point*/
+		break;
 	}
 
 	return t;
@@ -466,15 +468,13 @@ REPLACE XX WITH THE CORRESPONDING ACCEPTING STATE NUMBER
 */
 Token aa_func03(char lexeme[]) {
 	Token t;
-	int offset;
-	int i;
 	char* temp_str;
 	if ((temp_str = (char*)calloc(VID_LEN + 2, sizeof(char))) == NULL) {
 		return aa_table[ES]("RUN TIME ERROR");
 	}
 
-	strcpy(temp_str, lexeme, VID_LEN);
-	temp_str[strlen(temp_str)] = "#"; /* Append # to end of the SVID */
+	strncpy(temp_str, lexeme, VID_LEN);
+	temp_str[strlen(temp_str)] = '#'; /* Add# to end of the SVID */
 
 	strncpy(t.attribute.vid_lex, temp_str, VID_LEN);
 	free(temp_str);
@@ -491,7 +491,6 @@ Token aa_func03(char lexeme[]) {
 	   AND THEN THE # CHARACTER IS APPENDED TO THE NAME.
 	   ADD \0 AT THE END TO MAKE A C-type STRING.
 	  */
-	return t;
 }
 
 /*ACCEPTING FUNCTION FOR THE integer literal(IL)-decimal constant(DIL)*/

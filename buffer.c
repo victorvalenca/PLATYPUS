@@ -177,7 +177,7 @@ size_t b_incfactor(Buffer* const pBD) {
  */
 short b_mark(Buffer* const pBD) {
     if (!pBD) { return R_FAIL1; }
-    return pBD->mark_coffset;
+    return pBD->mark_offset;
 }
 
 /* Reports if the character buffer's memory space was relocated after resizing
@@ -431,7 +431,7 @@ int b_reset(Buffer* const pBD) {
 
     pBD->addc_offset = OFFSET_RESET;
     pBD->getc_offset = OFFSET_RESET;
-    pBD->mark_coffset = OFFSET_RESET;
+    pBD->mark_offset = OFFSET_RESET;
     pBD->eob = UNSET_EOB_FLAG;
 	pBD->r_flag = UNSET_R_FLAG;
     return TRUE;
@@ -448,11 +448,11 @@ int b_reset(Buffer* const pBD) {
 short b_retract_to_mark(Buffer* const pBD) {
     /* Check if any offsets are out of bounds */
     if(!pBD ||
-        pBD->mark_coffset < OFFSET_RESET || 
-        pBD->mark_coffset > pBD->capacity){
+        pBD->mark_offset < OFFSET_RESET || 
+        pBD->mark_offset > pBD->capacity){
         return R_FAIL1;
     }
-    pBD->getc_offset = pBD->mark_coffset;
+    pBD->getc_offset = pBD->mark_offset;
     return pBD->getc_offset;
 }
 
