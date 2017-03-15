@@ -1,6 +1,7 @@
 /* Filename: table.h
  * Transition Table and function declarations necessary for the scanner implementation
  * as required for CST8152 - Assignment #2.
+ * Author: Victor Fernandes, 040772243
  * Version: 1.17.1
  * Date: 30 January 2017
  * Provided by: Svillen Ranev
@@ -105,10 +106,7 @@ Token aa_func03(char *lexeme); // VID SVID
 Token aa_func05(char *lexeme); // DIL
 Token aa_func08(char *lexeme); // FPL
 Token aa_func10(char *lexeme); // OIL
-Token aa_func11(char *lexeme); // ES1 (Nothing here)
-Token aa_func12(char *lexeme); // ES2
-Token aa_func13(char *lexeme); // ES3
-
+Token aa_func11(char *lexeme); // ES
 //Replace XX with the number of the accepting state: 02, 03 and so on.
 
 /* defining a new type: pointer to function (of one char * argument)
@@ -137,8 +135,8 @@ PTR_AAF aa_table[] = {
 	/* State 9 */	NULL,
 	/* State 10 */	aa_func10,
 	/* State 11 */	aa_func11,
-	/* State 12 */	aa_func12,
-	/* State 13 */	aa_func13
+	/* State 12 */	aa_func11,
+	/* State 13 */	aa_func11
 
 	//HERE YOU MUST PROVIDE AN INITIALIZATION FOR AN ARRAY OF POINTERS
 	//TO ACCEPTING FUNCTIONS. THE ARRAY HAS THE SAME SIZE AS as_table[ ].

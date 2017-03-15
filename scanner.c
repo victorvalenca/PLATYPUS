@@ -4,12 +4,10 @@
  *    as required for CST8152, Assignment #2
  *    scanner_init() must be called before using the scanner.
  *    The file is incomplete;
+ *    Author: Victor Fernandes, 040772243
  *    Provided by: Svillen Ranev
  *    Version: 1.17.1
  *    Date: 30 January 2017
- *******************************************************************
- *    REPLACE THIS HEADER WITH YOUR HEADER
- *******************************************************************
  */
 
 /* The #define _CRT_SECURE_NO_WARNINGS should be used in MS Visual Studio projects
@@ -85,15 +83,51 @@ which is being processed by the scanner.
 */ 
         
         
-        DECLARE YOUR VARIABLES HERE IF NEEDED 
+        //DECLARE YOUR VARIABLES HERE IF NEEDED 
         
                 
         while (1){ /* endless loop broken by token returns it will generate a warning */
                 
-        GET THE NEXT SYMBOL FROM THE INPUT BUFFER 
+        //GET THE NEXT SYMBOL FROM THE INPUT BUFFER 
         
         c = b_getc(sc_buf);
-
+		switch (c) {
+			case 255: t.code = SEOF_T; return t; /* EOF */
+			case '\0': t.code = SEOF_T; return t; /* Source EOF */
+			case '\n': line++; continue; /* Ignore new line, increment line count */
+			case '\r': line++; continue; /* CR, increment line count*/
+			case ' ': continue; /* Ignore white space */
+			case ';': t.code = EOS_T; return t; /* End of statement */
+			case ',': t.code = COM_T; return t; /* Comma */
+			case '{': t.code = RBR_T; return t; /* Right brace */
+			case '}': t.code = LBR_T; return t; /* Left brace */
+			case '(': t.code = RPR_T; return t; /* Right parenthesis */
+			case ')': t.code = LPR_T; return t; /* Left parenthesis */
+			case '+': t.code = ART_OP_T; t.attribute.arr_op = PLUS; return t; /* Addition operator */
+			case '-': t.code = ART_OP_T; t.attribute.arr_op = MINUS; return t; /* Substraction operator */
+			case '*': t.code = ART_OP_T; t.attribute.arr_op = MULT; return t; /* Multiplication operator */
+			case '/': t.code = ART_OP_T; t.attribute.arr_op = DIV; return t; /* Devision operator */
+			case '>': t.code = REL_OP_T; t.attribute.rel_op = GT; return t; /* Greater-than relational operator */
+			case '<':
+				if (c = b_getc(sc_buf) == '>') {
+					t.code = REL_OP_T;
+					t.attribute.rel_op = NE; /* Negation operator */
+					return t;
+				}
+				else if (c == '<') {
+					t.code == SCC_OP_T; /* String concatenation operator */
+				}
+				else {
+					t.code = REL_OP_T;
+					t.attribute.rel_op = LT; /* Less-than operator */
+				}
+				b_retract(sc_buf);
+				c = b_getc(sc_buf);
+				return t;
+			case '.':
+				b_setmark(sc_buf, b_getcoffset(sc_buf)
+			default: /* TODO: Do alpha [a-zA-Z] stuff here*/
+		}
 
               
 /* special cases or token driven processing */
