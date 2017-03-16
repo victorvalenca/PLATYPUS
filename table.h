@@ -34,21 +34,17 @@
    *  .AND., .OR. , SEOF, 'wrong symbol',
    */
 
-
-   //REPLACE *ESN* WITH YOUR ERROR STATE NUMBER 
-#define ES 12 /* Error state */
+#define ES 13    /* Error state */
 #define IS -1    /* Invalid state */
 
 /* State transition table definition */
-
-//REPLACE *CN* WITH YOUR COLUMN NUMBER  
 
 #define TABLE_COLUMNS 7
 /*transition table - type of states defined in separate table */
 int  st_table[][TABLE_COLUMNS] = {
 	/*	INPUT COLUMNS:
-		COLUMN # |	 0	  | 1 |	 2	|  3  |	4 |	5  |  6  |
-				  [a-zA-Z]| 0 |[1-7]|[8-9]| . | #  | other
+        COLUMN # |   0    | 1 |  2  |  3  | 4 |	5  |  6   |
+				 |[a-zA-Z]| 0 |[1-7]|[8-9]| . | #  | other|
 	*/							  
 	/* State 0 */	{1,     6 ,  4 ,   4 , IS , IS , IS},
 	/* State 1 */	{1,     1 ,  1 ,   1 , ES , 3  , 2},
@@ -57,22 +53,18 @@ int  st_table[][TABLE_COLUMNS] = {
 	/* State 4 */	{ES,    4 ,  4 ,   4 ,  7 ,  5 , 5},
 	/* State 5 */	{IS,   IS ,  IS,   IS, IS , IS , IS},
 	/* State 6 */	{ES,    9 ,   9,   ES,  7 , ES ,  5},
-	/* State 7 */	{ES,    7 ,   7,    7, ES ,  8 ,  8},
+	/* State 7 */	{ES,    7 ,   7,    7,  8 ,  8 ,  8},
 	/* State 8 */	{IS,   IS ,  IS,   IS, IS , IS , IS},
 	/* State 9 */	{ES,    9 ,   9,   ES, ES , ES , 10},
 	/* State 10 */	{IS,   IS ,  IS,   IS, IS , IS , IS},
 	/* State 11 */	{IS,   IS ,  IS,   IS, IS , IS , IS},
 	/* State 12 */	{IS,   IS ,  IS,   IS, IS , IS , IS},
 	/* State 13 */	{IS,   IS ,  IS,   IS, IS , IS , IS}
-	//
-	//. YOUR TABLE INITIALIZATION HERE
-	//.
-	///* State N */  {YOUR INITIALIZATION}, 
+
 };
 /* Accepting state table definition */
-//REPLACE *N1*, *N2*, and *N3* WITH YOUR NUMBERS
-#define ASWR     2  /* accepting state with retract */
-#define ASNR     3  /* accepting state with no retract */
+#define ASWR     1  /* accepting state with retract */
+#define ASNR     2  /* accepting state with no retract */
 #define NOAS     0  /* not accepting state */
 
 int as_table[] = {
@@ -96,19 +88,12 @@ int as_table[] = {
 
 /* Accepting action function declarations */
 
-//FOR EACH OF YOUR ACCEPTING STATES YOU MUST PROVIDE
-//ONE FUNCTION PROTOTYPE. THEY ALL RETURN Token AND TAKE
-//ONE ARGUMENT: A string REPRESENTING A TOKEN LEXEME. 
-
-// Example: Token aa_funcXX(char *lexeme);
-
-Token aa_func02(char* lexeme); // VID AVID/KW
-Token aa_func03(char *lexeme); // VID SVID
-Token aa_func05(char *lexeme); // DIL
-Token aa_func08(char *lexeme); // FPL
-Token aa_func10(char *lexeme); // OIL
-Token aa_func12(char *lexeme); // ES
-//Replace XX with the number of the accepting state: 02, 03 and so on.
+Token aa_func02(char* lexeme); /* AVID/KW */
+Token aa_func03(char* lexeme); /* SVID */
+Token aa_func05(char* lexeme); /* DIL */
+Token aa_func08(char* lexeme); /* FPL */
+Token aa_func10(char* lexeme); /* OIL */
+Token aa_func13(char* lexeme); /* ES */
 
 /* defining a new type: pointer to function (of one char * argument)
    returning Token
@@ -136,8 +121,8 @@ PTR_AAF aa_table[] = {
 	/* State 9 */	NULL,
 	/* State 10 */	aa_func10,
 	/* State 11 */	NULL,
-	/* State 12 */	aa_func12,
-	/* State 13 */	NULL
+	/* State 12 */	NULL,
+	/* State 13 */	aa_func13
 
 	//HERE YOU MUST PROVIDE AN INITIALIZATION FOR AN ARRAY OF POINTERS
 	//TO ACCEPTING FUNCTIONS. THE ARRAY HAS THE SAME SIZE AS as_table[ ].
