@@ -85,7 +85,7 @@ Token malar_next_token(Buffer * sc_buf)
  */
 
 
- //DECLARE YOUR VARIABLES HERE IF NEEDED 
+ /*DECLARE YOUR VARIABLES HERE IF NEEDED */
 	int i; /* Counter for loop in string error case */
 	static int str_offset = 0;
 
@@ -156,16 +156,17 @@ Token malar_next_token(Buffer * sc_buf)
 		case '!':
 			c = b_getc(sc_buf);
 			if (c == '<') { /* It's a comment line */
-				for (; c != '\0' && c != '\r' && c != '\n' && c != 255; c = b_getc(sc_buf)); /* Consume chars until line ends */
+				/* Consume chars until line ends */
+				for (; c != '\0' && c != '\r' && c != '\n' && c != 255; c = b_getc(sc_buf));
 				line++;
 				continue;
 			}
 			else { /* Bad character, pump out an error token */
 				b_retract(sc_buf);
 				b_retract(sc_buf);
-				t = aa_table[ES]("  ");
 				t.attribute.err_lex[0] = c = b_getc(sc_buf);
 				t.attribute.err_lex[1] = c = b_getc(sc_buf);
+				t.attribute.err_lex[2] = '\0';
 				b_retract(sc_buf);
 				return t;
 			}
@@ -180,35 +181,43 @@ Token malar_next_token(Buffer * sc_buf)
 			t.code = ASS_OP_T; /* Assignment operator */
 			return t;
 		case '\"': /* Don't quote me on this */
-			c = b_getc(sc_buf);
 			t.code = STR_T; /* String literal */
 			b_setmark(sc_buf, b_getcoffset(sc_buf));
-			lexstart = (short)str_offset;
+			lexstart = b_getcoffset(sc_buf);
 			lexend = lexstart;
+			c = b_getc(sc_buf);
 			for (; c != '\"'; c = b_getc(sc_buf)) {
-				b_addc(str_LTBL, c);
-				if (b_isfull(str_LTBL)) {
-					t = aa_table[ES]("\"There is always ..."); /* String too big :( */
-				}
+				/* Step through the string literal and track progress  */
+				/* b_addc(str_LTBL, c); */
 				if (c == '\n' || c == '\r') {
-					line++;
+					++line;
 				}
-				if (c == 255 || c == '\0') {
+				if (c == '\0') {
 					b_retract_to_mark(sc_buf);
 					t.code = ERR_T; /* Illegal string, make it an error token */
 					for (i = 0; i < ERR_LEN; i++) {
 						t.attribute.err_lex[i] = b_getc(sc_buf);
 					}
+					/* If the erroneous string is too long,
+					 * replace last three characterss with '...'' */
+					if ((lexend - lexstart) > ERR_LEN) {
+						t.attribute.err_lex[i-1] = '.';
+						t.attribute.err_lex[i-2] = '.';
+						t.attribute.err_lex[i-3] = '.';
+					}
 					t.attribute.err_lex[i] = '\0';
 					return t;
 				}
-				lexend++;
-				str_offset++;
-			} /*end for loop, string finished*/
+				++lexend;
+				++str_offset;
+			} /* end for loop, string finished and considered valid */
+			b_retract_to_mark(sc_buf);
 
-			b_addc(str_LTBL, '\0');
+			/* Copy the matched string literal to str_LTBL */
+			for (; lexstart < lexend; ++lexstart){
+				b_addc(str_LTBL, b_getc(sc_buf));
+			}
 			t.attribute.str_offset = lexstart;
-			
 			return t;
 		default:
 			if (isalpha(c) || isalnum(c)) {
@@ -268,101 +277,101 @@ Token malar_next_token(Buffer * sc_buf)
 		}
 
 
-		/* special cases or token driven processing */
+		/* special cases or token driven processing 
 		
-		// WRITE YOUR CODE FOR PROCESSING THE SPECIAL CASES HERE. 
-		// COMMENTS AND STRING LITERALS ARE ALSO PROCESSED HERE.
+		WRITE YOUR CODE FOR PROCESSING THE SPECIAL CASES HERE. 
+		COMMENTS AND STRING LITERALS ARE ALSO PROCESSED HERE.
 		
-		// WHAT FOLLOWS IS A PSEUDO CODE. YOU CAN USE switch STATEMENT
-		// INSTEAD OF if-else TO PROCESS THE SPECIAL CASES
-		// DO NOT FORGET TO COUNT THE PROGRAM LINES
+		WHAT FOLLOWS IS A PSEUDO CODE. YOU CAN USE switch STATEMENT
+		INSTEAD OF if-else TO PROCESS THE SPECIAL CASES
+		DO NOT FORGET TO COUNT THE PROGRAM LINES
 		  
 		            
-		//   IF (c == SOME CHARACTER)  
-		//                       ...
-		//       SKIP CHARACTER (FOR EXAMPLE SPACE)
-		//       continue;      
-		//       OR SET TOKEN (SET TOKEN CODE AND TOKEN ATTRIBUTE(IF AVAILABLE))
-		//       return t;
-		//   EXAMPLE:
-		//   if (c == ' ') continue;
-		//   if (c == '{'){ t.code = RBR_T; /*no attribute */ return t; 
-		//   if (c == '+'){ t.code = ART_OP_T; t.attribute.arr_op = PLUS */ return t;                 
-		//   ...
+		  IF (c == SOME CHARACTER)  
+		                      ...
+		      SKIP CHARACTER (FOR EXAMPLE SPACE)
+		      continue;      
+		      OR SET TOKEN (SET TOKEN CODE AND TOKEN ATTRIBUTE(IF AVAILABLE))
+		      return t;
+		  EXAMPLE:
+		  if (c == ' ') continue;
+		  if (c == '{'){ t.code = RBR_T; (no attribute) return t; 
+		  if (c == '+'){ t.code = ART_OP_T; t.attribute.arr_op = PLUS return t;                 
+		  ...
 		  
-		//   IF (c == '.') TRY TO PROCESS .AND. or .OR.
-		//   IF SOMETHING ELSE FOLLOWS . OR THE LAST . IS MISSING
-		//   RETURN AN ERROR TOKEN                                               
-		//   IF (c == '!') TRY TO PROCESS COMMENT
-		//   IF THE FOLLOWING IS NOT CHAR IS NOT < REPORT AN ERROR
-		//   ELSE IN A LOOP SKIP CHARACTERS UNTIL line terminator is found THEN continue;
-		//   ...
-		//   IF STRING (FOR EXAMPLE, "text") IS FOUND      
-		//      SET MARK TO MARK THE BEGINNING OF THE STRING
-		//      IF THE STRING IS LEGAL   
-		//         USING b_addc(..)COPY THE text FROM INPUT BUFFER INTO str_LTBL 
-		//         ADD '\0' at the end make the string C-type string 
-		//         SET STRING TOKEN
-		//         (the attribute of the string token is the offset from
-		//         the beginning of the str_LTBL char buffer to the beginning 
-		//         of the string (TEXT in the example)) 
+		  IF (c == '.') TRY TO PROCESS .AND. or .OR.
+		  IF SOMETHING ELSE FOLLOWS . OR THE LAST . IS MISSING
+		  RETURN AN ERROR TOKEN                                               
+		  IF (c == '!') TRY TO PROCESS COMMENT
+		  IF THE FOLLOWING IS NOT CHAR IS NOT < REPORT AN ERROR
+		  ELSE IN A LOOP SKIP CHARACTERS UNTIL line terminator is found THEN continue;
+		  ...
+		  IF STRING (FOR EXAMPLE, "text") IS FOUND      
+		     SET MARK TO MARK THE BEGINNING OF THE STRING
+		     IF THE STRING IS LEGAL   
+		        USING b_addc(..)COPY THE text FROM INPUT BUFFER INTO str_LTBL 
+		        ADD '\0' at the end make the string C-type string 
+		        SET STRING TOKEN
+		        (the attribute of the string token is the offset from
+		        the beginning of the str_LTBL char buffer to the beginning 
+		        of the string (TEXT in the example)) 
 		
-		//         return t;
-		//      ELSE  
-		//        THE STRING LITERAL IS ILLEGAL
-		//        SET ERROR TOKEN FOR ILLEGAL STRING (see assignment)
-		//        DO NOT STORE THE ILLEGAL STRINg IN THE str_LTBL
+		        return t;
+		     ELSE  
+		       THE STRING LITERAL IS ILLEGAL
+		       SET ERROR TOKEN FOR ILLEGAL STRING (see assignment)
+		       DO NOT STORE THE ILLEGAL STRINg IN THE str_LTBL
 		
-		//        return t;
+		       return t;
 		  
-		// 	  IF(c == ANOTHER CHARACTER)
-		// 		  SET TOKEN
-		// 		  return t;
-		// /* Process state transition table */
+			  IF(c == ANOTHER CHARACTER)
+				  SET TOKEN
+				  return t;
+		  Process state transition table 
 
-		//   IF (c is a digit OR c is a letter){
+		  IF (c is a digit OR c is a letter){
 		  
-		//   SET THE MARK AT THE BEGINING OF THE LEXEME
-		//   b_setmark(sc_buf,forward);                      
-		//    ....
-		//   CODE YOUR FINATE STATE MACHINE HERE (FSM or DFA)
-		//   IT IMPLEMENTS THE FOLLOWING ALGORITHM:
+		  SET THE MARK AT THE BEGINING OF THE LEXEME
+		  b_setmark(sc_buf,forward);                      
+		   ....
+		  CODE YOUR FINATE STATE MACHINE HERE (FSM or DFA)
+		  IT IMPLEMENTS THE FOLLOWING ALGORITHM:
 		  
-		//   FSM0. Begin with state = 0 and the input character c 
-		//   FSM1. Get the next state from the transition table calling                       
-		//        state = get_next_state(state, c, &accept);
-		//   FSM2. Get the next character
-		//   FSM3. If the state is not accepting (accept == NOAS), go to step FSM1
-		//        If the step is accepting, token is found, leave the machine and
-		//        call an accepting function as described below.     
+		  FSM0. Begin with state = 0 and the input character c 
+		  FSM1. Get the next state from the transition table calling                       
+		       state = get_next_state(state, c, &accept);
+		  FSM2. Get the next character
+		  FSM3. If the state is not accepting (accept == NOAS), go to step FSM1
+		       If the step is accepting, token is found, leave the machine and
+		       call an accepting function as described below.     
 		  
 		                       
-		//   RETRACT  getc_offset IF THE FINAL STATE IS A RETRACTING FINAL STATE
-		//   GET THE BEGINNING AND THE END OF THE LEXEME
-		//   lexstart = b_getmark(sc_buf);
-		//   SET lexend TO getc_offset USING AN APPROPRIATE BUFFER FUNCTION
-		//   CREATE  A TEMPORRARY LEXEME BUFFER HERE;
-		//   lex_buf = b_create(...);
-		//   . RETRACT getc_offset to the MARK SET PREVIOUSLY AT THE BEGINNING OF THE LEXEME AND
-		//   . USING b_getc() COPY THE LEXEME BETWEEN lexstart AND lexend FROM THE INPUT BUFFER INTO lex_buf USING b_addc(...),
-		//   . WHEN VID (KEYWORDS INCLUDED), FPL OR IL IS RECOGNIZED
-		//   . YOU MUST CALL THE ACCEPTING FUNCTION USING THE ARRAY aa_table ,WHICH
-		//   . CONTAINS POINTERS TO FUNCTIONS. THE ARRAY INDEX OF THE FUNCTION TO BE
-		//   . CALLED IS STORED IN THE VARIABLE state.
-		//   . YOU ARE NOT ALLOWED TO CALL ANY OF THE ACCEPTING FUNCTIONS BY NAME.
-		//   . THE ARGUMENT TO THE FUNCTION IS THE STRING STORED IN lex_buf.
-		//   ....
-		//   b_free(lex_buf);
-		//   return t;
+		  RETRACT  getc_offset IF THE FINAL STATE IS A RETRACTING FINAL STATE
+		  GET THE BEGINNING AND THE END OF THE LEXEME
+		  lexstart = b_getmark(sc_buf);
+		  SET lexend TO getc_offset USING AN APPROPRIATE BUFFER FUNCTION
+		  CREATE  A TEMPORRARY LEXEME BUFFER HERE;
+		  lex_buf = b_create(...);
+		  . RETRACT getc_offset to the MARK SET PREVIOUSLY AT THE BEGINNING OF THE LEXEME AND
+		  . USING b_getc() COPY THE LEXEME BETWEEN lexstart AND lexend FROM THE INPUT BUFFER INTO lex_buf USING b_addc(...),
+		  . WHEN VID (KEYWORDS INCLUDED), FPL OR IL IS RECOGNIZED
+		  . YOU MUST CALL THE ACCEPTING FUNCTION USING THE ARRAY aa_table ,WHICH
+		  . CONTAINS POINTERS TO FUNCTIONS. THE ARRAY INDEX OF THE FUNCTION TO BE
+		  . CALLED IS STORED IN THE VARIABLE state.
+		  . YOU ARE NOT ALLOWED TO CALL ANY OF THE ACCEPTING FUNCTIONS BY NAME.
+		  . THE ARGUMENT TO THE FUNCTION IS THE STRING STORED IN lex_buf.
+		  ....
+		  b_free(lex_buf);
+		  return t;
 		     
-		//     CHECK OTHER CHARS HERE if NEEDED, SET A TOKEN AND RETURN IT.
-		//     FOR ILLEGAL CHARACTERS SET ERROR TOKEN. 
-		//     THE ILLEGAL CHAR IS THE ATTRIBUTE OF THE ERROR TOKEN 
-		//     IN A CASE OF RUNTIME ERROR, THE FUNCTION MUST STORE 
-		//     A NON-NEGATIVE NUMBER INTO THE GLOBAL VARIABLE scerrnum
-		//     AND RETURN AN ERROR TOKEN. THE ERROR TOKEN ATTRIBUTE MUST
-		//     BE THE STRING "RUN TIME ERROR: "       
-
+		    CHECK OTHER CHARS HERE if NEEDED, SET A TOKEN AND RETURN IT.
+		    FOR ILLEGAL CHARACTERS SET ERROR TOKEN. 
+		    THE ILLEGAL CHAR IS THE ATTRIBUTE OF THE ERROR TOKEN 
+		    IN A CASE OF RUNTIME ERROR, THE FUNCTION MUST STORE 
+		    A NON-NEGATIVE NUMBER INTO THE GLOBAL VARIABLE scerrnum
+		    AND RETURN AN ERROR TOKEN. THE ERROR TOKEN ATTRIBUTE MUST
+		    BE THE STRING "RUN TIME ERROR: "       
+			*/
 	}//end while(1)
 }
 
@@ -451,7 +460,7 @@ Token aa_func02(char lexeme[]) {
 	char* temp_str;
 
 #ifdef DEBUG
-	printf("Lexeme: '%s'\n size of: %lu\n", lexeme, sizeof(lexeme));
+	printf("Lexeme: '%s'\n size of: %ld\n", lexeme, sizeof(&lexeme)*sizeof(char));
 #endif
 
 	kw_idx = iskeyword(lexeme);

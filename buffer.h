@@ -24,9 +24,7 @@
 
 #ifdef MACOS_DEP
     #include <mm_malloc.h> /* for dynamic memory allocation.*/
-#endif
-
-#ifndef MACOS_DEP
+#else
     #include <malloc.h>
 #endif
 #include <limits.h> /* implementation-defined data type ranges and limits */
