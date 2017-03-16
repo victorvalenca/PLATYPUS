@@ -13,13 +13,22 @@
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
+#define MACOS_DEP
+
 /*#pragma warning(1:4001) *//*to enforce C89 type comments  - to make //comments an warning */
 
 /*#pragma warning(error:4001)*//* to enforce C89 comments - to make // comments an error */
 
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
-#include <malloc.h> /* for dynamic memory allocation.*/
+
+#ifdef MACOS_DEP
+    #include <mm_malloc.h> /* for dynamic memory allocation.*/
+#endif
+
+#ifndef MACOS_DEP
+    #include <malloc.h>
+#endif
 #include <limits.h> /* implementation-defined data type ranges and limits */
 
 /* constant definitions */
