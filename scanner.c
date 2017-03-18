@@ -1,5 +1,5 @@
 /* Filename: scanner.c
-/* PURPOSE:
+   PURPOSE:
  *    SCANNER.C: Functions implementing a Lexical Analyzer (Scanner)
  *    as required for CST8152, Assignment #2
  *    scanner_init() must be called before using the scanner.
