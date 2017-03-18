@@ -23,7 +23,7 @@ L(SVID) = AVID#
 ```
 ## Integer Literals
 ```
-L(DIL) = 0 | [1-9]*
+L(DIL) = 0|([1-9][0-9]*)
 
 L(NzD) = [1-9]
 
@@ -31,7 +31,7 @@ L(D) = [0-9]
 
 L(OD) = [0-7]
 
-L(OIL) = 0([0-7])*
+L(OIL) = 0(0|[1-7][0-7]*)
 
 L(IL) = (DIL | OIL)
 

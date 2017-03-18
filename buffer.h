@@ -14,7 +14,7 @@
 #define BUFFER_H_
 
 #define MACOS_DEP
-
+#undef MACOS_DEP
 /*#pragma warning(1:4001) *//*to enforce C89 type comments  - to make //comments an warning */
 
 /*#pragma warning(error:4001)*//* to enforce C89 comments - to make // comments an error */
