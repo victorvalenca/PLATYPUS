@@ -184,48 +184,45 @@ Token malar_next_token(Buffer * sc_buf)
 			t.code = ASS_OP_T; /* Assignment operator */
 			return t;
 		case '\"': /* Don't quote me on this */
-			
+
 			/* Track the beginning of string */
 			b_setmark(sc_buf, b_getcoffset(sc_buf));
 			lexstart = b_mark(sc_buf);
 			lexend = lexstart;
 			c = b_getc(sc_buf);
-			/* Step through the string literal and track progress  *//*
-			c = b_getc(sc_buf);*/
-			for (; c != '\"' || c!= 255; c = b_getc(sc_buf), ++lexend) {
+			/* Step through the string literal and track progress  */
+			for (; c != '\"'; c = b_getc(sc_buf), ++lexend) {
 				if (c == '\n' || c == '\r')
 					++line;
-				else if (c == '\0') { /* Illegal string, make it an error token */
+				if (c == '\0' || c == EOF) { /* Illegal string, make it an error token */
 					b_retract_to_mark(sc_buf);
 					b_retract(sc_buf);
+					b_retract(sc_buf);
 					t.code = ERR_T;
-					
-					for (i = 0; i < ERR_LEN; ++i) 
-						t.attribute.err_lex[i] = b_getc(sc_buf);
-					
-					/* If the erroneous string is too long,
-					 * replace last three characterss with '...'' */
-					if ((lexend - lexstart) > ERR_LEN) {
-						t.attribute.err_lex[i - 1] = '.';
-						t.attribute.err_lex[i - 2] = '.';
-						t.attribute.err_lex[i - 3] = '.';
+
+					for (i = 0; i < lexend; ++i) {
+						if (i == ERR_LEN) continue;
+						if (i < (ERR_LEN - 3))
+							t.attribute.err_lex[i] = b_getc(sc_buf);
+						else {
+							t.attribute.err_lex[i] = '.';
+						}
 					}
-					t.attribute.err_lex[i] = '\0';
-					scerrnum = 1;
+					t.attribute.err_lex[ERR_LEN] = '\0';
 					return t;
 				}
 			} /* end for loop, string finished and considered valid */
-			lexend = b_getcoffset(sc_buf);
 			b_retract_to_mark(sc_buf);
 
-			
+
 			/* Copy the matched string literal to str_LTBL */
-			for (; lexstart < lexend; ++lexstart, ++str_offset) {
-				b_addc(str_LTBL, b_getc(sc_buf));
-			}
-			b_addc(str_LTBL, '\0');
-			t.code = STR_T;
 			t.attribute.str_offset = str_offset;
+			c = b_getc(sc_buf);
+			for (; lexstart < lexend; c = b_getc(sc_buf), ++lexstart, ++str_offset) {
+				b_addc(str_LTBL, c);
+			}
+			b_addc(str_LTBL, '\0'); ++str_offset;
+			t.code = STR_T;
 			return t;
 		default:
 			if (isalpha(c) || isalnum(c)) {
@@ -285,7 +282,7 @@ Token malar_next_token(Buffer * sc_buf)
 		}
 
 
-		
+
 	}//end while(1)
 }
 
@@ -494,22 +491,23 @@ err_lex C-type string. */
 
 Token aa_func08(char lexeme[]) {
 	Token t;
-	double temp_dbl;
+	double temp_dbl = 0.0f;
 
 	t.code = FPL_T;
 	if (strstr(lexeme, "0.0")) {
 		t.attribute.flt_value = 0.0f;
 	}
-
-	temp_dbl = atof(lexeme);
+	else  /* strtof() returns 0 if the value is out of range) */
+		temp_dbl = strtof(lexeme, NULL);
 #ifdef DEBUG
 	printf("Lexeme: '%s' | FLT value: %f  \n", lexeme, temp_dbl);
 #endif
-	if ((temp_dbl > FLT_MAX) || (temp_dbl < 0)) { /* Overflow error */
+	if ((temp_dbl > FLT_MAX) || (temp_dbl <= 0)) { /* Overflow error */
 		t = aa_table[ES](lexeme);
 		return t;
-	}
+}
 	t.attribute.flt_value = (float)temp_dbl;
+
 	return t;
 	/*
 THE FUNCTION MUST CONVERT THE LEXEME TO A FLOATING POINT VALUE,
@@ -566,15 +564,15 @@ err_lex C-type string.
 /*ACCEPTING FUNCTION FOR THE ERROR TOKEN */
 
 Token aa_func12(char lexeme[]) {
-/*
-	Token t;
-	unsigned int i;
-	t.code = ERR_T;
-	for (i = 0; i < (ERR_LEN - 1) && i < strlen(lexeme); i++)
-		t.attribute.err_lex[i] = lexeme[i];
-	t.attribute.err_lex[i] = '\0';
+	/*
+		Token t;
+		unsigned int i;
+		t.code = ERR_T;
+		for (i = 0; i < (ERR_LEN - 1) && i < strlen(lexeme); i++)
+			t.attribute.err_lex[i] = lexeme[i];
+		t.attribute.err_lex[i] = '\0';
 
-	return t;*/
+		return t;*/
 	return aa_table[ESWR](lexeme);
 	/*
 	THE FUNCTION SETS THE ERROR TOKEN. lexeme[] CONTAINS THE ERROR
@@ -591,7 +589,7 @@ Token aa_func13(char lexeme[]) {
 	Token t;
 	unsigned int i;
 	t.code = ERR_T;
-	for (i = 0; i < (ERR_LEN - 1) && i < strlen(lexeme); i++)
+	for (i = 0; i < (ERR_LEN) && i < strlen(lexeme); i++)
 		t.attribute.err_lex[i] = lexeme[i];
 
 	if (strlen(lexeme) > ERR_LEN) {
