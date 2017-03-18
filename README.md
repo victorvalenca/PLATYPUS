@@ -10,14 +10,14 @@
 - `make [gcc | clang]`
     - Default is to build both versions (this is an aftermath of testing behaviour from different compilers)
     - It is safe to modify the default to either gcc or clang if you don't have one of them
-
+- **NOTE: I haven't tested or created make targets for the scanner yet.**
 ### Windows
 #### Requires
-- `msvc` (tested under Visual Studio 2015 with Update 3, however VS2013 shouldn't behave abnormally either)
+- `msvc` (tested under Visual Studio 2015 with Update 3, however VS2013 shouldn't behave abnormally either, nor should 2017)
 - Disable language extensions (use ANSI C)
 ---
 ## Running
-
+### Running the Buffer only
 - *macOS/linux*
     - `$ ./buffer_<compiler> <file> [f | a | m] > <out_file>`
 - *Windows*
@@ -37,4 +37,4 @@ You can modify the initial capacity and increment factor defined in `platy_bt.c`
 - Increment factor range for additive mode: `1 - 255`. (setting this to 0 implies fixed mode, regardless of the mode given in the command line)
 - Initial capacity range (in bytes): `0 - 32767 (SHRT_MAX)`
 - This is due to my environment's install locations for the C include libraries: 
-    - **Inside `buffer.h`, change the `#include` statement from `mm_malloc.h` to `malloc.h`, depending on what your compiler uses. Homebrew gcc6 installs on macOS might need this, but Linux and Windows generally will use `malloc.h`**
+    - **Inside `buffer.h`, there is a `#DEFINE` line for `MACOS_DEP`. If you are using a Linux system or Windows and your malloc.h is actually named malloc.h, you can leave `#undef MACOS_DEP` alone, otherwise comment it out.**
