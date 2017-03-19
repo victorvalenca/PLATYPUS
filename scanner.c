@@ -210,14 +210,7 @@ Token malar_next_token(Buffer * sc_buf)
 						if (i < (ERR_LEN) || c != 255)
 							b_addc(err_lex_buf, c);
 					}
-					t = aa_table[ES](err_lex_buf->cb_head);
-				/*	t.attribute.err_lex[ERR_LEN - 1] = '.';
-					t.attribute.err_lex[ERR_LEN - 2] = '.';
-					t.attribute.err_lex[ERR_LEN - 3] = '.';
-					if ((lexend - lexstart) < ERR_LEN)
-						t.attribute.err_lex[i] = '\0';
-					else 
-						t.attribute.err_lex[ERR_LEN] = '\0';*/
+					t = aa_table[ES](b_setmark(err_lex_buf, 0));
 					b_free(err_lex_buf);
 					return t;
 				}
