@@ -91,6 +91,7 @@ Token malar_next_token(Buffer * sc_buf)
 	/*String offset for the str_LTBL*/
 	static short str_offset = 0;
 
+	pBuffer err_lex_buf;
 
 	if (sc_buf == NULL) {
 		scerrnum = 1;
@@ -196,21 +197,28 @@ Token malar_next_token(Buffer * sc_buf)
 					++line;
 				if (c == '\0' || b_eob(sc_buf) || c == 255) { /* Illegal string, make it an error token */
 					b_retract_to_mark(sc_buf);
-					b_retract(sc_buf);
+					b_retract(sc_buf); /* Retract one more time to re-read '"' into err_lex */
 					t.code = ERR_T;
+
+					err_lex_buf = b_create(1, 1, 'a');
+
 
 					c = b_getc(sc_buf);
 					for (i = 0; i < (lexend - lexstart); c = b_getc(sc_buf), ++i) {
 						/* Continue until the end of the lexeme where error was found
 						*  (error string attribute full) */
-						if (i < (ERR_LEN - 3)) {
-							t.attribute.err_lex[i] = c;
-						}
-						else {
-							t.attribute.err_lex[i] = '.';
-						}
+						if (i < (ERR_LEN) || c != 255)
+							b_addc(err_lex_buf, c);
 					}
-					t.attribute.err_lex[ERR_LEN] = '\0';
+					t = aa_table[ES](err_lex_buf->cb_head);
+				/*	t.attribute.err_lex[ERR_LEN - 1] = '.';
+					t.attribute.err_lex[ERR_LEN - 2] = '.';
+					t.attribute.err_lex[ERR_LEN - 3] = '.';
+					if ((lexend - lexstart) < ERR_LEN)
+						t.attribute.err_lex[i] = '\0';
+					else 
+						t.attribute.err_lex[ERR_LEN] = '\0';*/
+					b_free(err_lex_buf);
 					return t;
 				}
 			} /* end for loop, string finished and considered valid */
@@ -225,6 +233,7 @@ Token malar_next_token(Buffer * sc_buf)
 			b_addc(str_LTBL, '\0'); ++str_offset;
 			t.code = STR_T;
 			return t;
+
 		default:
 			if (isalpha(c) || isalnum(c)) {
 
