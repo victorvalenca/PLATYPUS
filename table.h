@@ -1,14 +1,10 @@
 /* Filename: table.h
- * Transition Table and function declarations necessary for the scanner implementation
+ * Transition Table and function declarations necessa`ry for the scanner implementation
  * as required for CST8152 - Assignment #2.
  * Author: Victor Fernandes, 040772243
  * Version: 1.17.1
  * Date: 30 January 2017
  * Provided by: Svillen Ranev
- * The file is incomplete. You are to complete it.
- ***************************************************
- * REPLACE THIS HEADER WITH YOUR HEADER
- ***************************************************
  */
 
 #ifndef  TABLE_H_
@@ -38,9 +34,9 @@
    *  .AND., .OR. , SEOF, 'wrong symbol',
    */
 
-#define ES  12   /* Error state */
+#define ES   12   /* Error state */
 #define ESWR 13   /* Error state (no retract) */
-#define IS -1    /* Invalid state */
+#define IS   -1   /* Invalid state */
 
 /* State transition table definition */
 

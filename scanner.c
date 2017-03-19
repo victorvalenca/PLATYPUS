@@ -1,13 +1,15 @@
 /* Filename: scanner.c
    PURPOSE:
- *    SCANNER.C: Functions implementing a Lexical Analyzer (Scanner)
- *    as required for CST8152, Assignment #2
- *    scanner_init() must be called before using the scanner.
- *    The file is incomplete;
- *    Author: Victor Fernandes, 040772243
- *    Provided by: Svillen Ranev
- *    Version: 1.17.1
- *    Date: 30 January 2017
+ * SCANNER.C: Functions implementing a Lexical Analyzer (Scanner)
+ * as required for CST8152, Assignment #2
+ * scanner_init() must be called before using the scanner.
+ * The file is incomplete;
+ * Author: Victor Fernandes, 040772243
+ * Provided by: Svillen Ranev
+ * Version: 1.17.1
+ * Date: 30 January 2017
+ * Function list: scanner_init, malar_next_token, get_next_state, char_class,
+  aa_func02, aa_func03, aa_func05, aa_func08, aa_func10, aa_func12 aa_func13, atool, iskeyword
  */
 
  /* The #define _CRT_SECURE_NO_WARNINGS should be used in MS Visual Studio projects
@@ -41,20 +43,28 @@
 /* This buffer is used as a repository for string literals.
    It is defined in platy_st.c */
 extern Buffer * str_LTBL; /*String literal table */
-int line; /* current line number of the source code */
-extern int scerrnum;     /* defined in platy_st.c - run-time error number */
+int line;                 /* current line number of the source code */
+extern int scerrnum;      /* defined in platy_st.c - run-time error number */
 
 /* Local(file) global objects - variables */
-static Buffer *lex_buf;/*pointer to temporary lexeme buffer*/
+static Buffer *lex_buf;   /*pointer to temporary lexeme buffer*/
 
 /* No other global variable declarations/definitiond are allowed */
 
 /* scanner.c static(local) function  prototypes */
-static int char_class(char c); /* character class function */
+static int char_class(char c);               /* character class function */
 static int get_next_state(int, char, int *); /* state machine function */
-static int iskeyword(char * kw_lexeme); /*keywords lookup functuion */
-static long atool(char * lexeme); /* converts octal string to decimal value */
+static int iskeyword(char * kw_lexeme);      /*keywords lookup functuion */
+static long atool(char * lexeme);            /* converts octal string to decimal value */
 
+/* Prepares the Scanner to read the source code buffer 
+ * Author: Svillen Ranev
+ * Called functions: b_isempty, b_setmark, b_retract_to_mark, b_reset
+ * Parameters:
+ *	- pBuffer sc_buf
+ * Return values:
+ *  - 1 (failure), 0 (success)
+*/
 int scanner_init(Buffer * sc_buf) {
 	if (b_isempty(sc_buf)) return EXIT_FAILURE;/*1*/
 	/* in case the buffer has been read previously  */
@@ -65,43 +75,44 @@ int scanner_init(Buffer * sc_buf) {
 	return EXIT_SUCCESS;/*0*/
 /*   scerrnum = 0;  *//*no need - global ANSI C */
 }
-
+/* Reads the source code buffer and generates a token
+ * Author: Victor Fernandes
+ * Version: 0.0.1
+ * Called functions: aa_table[], b_getc, b_setmark, b_getcoffset, b_retract_to_mark,
+ b_retract, b_mark, b_eob, b_create, b_addc, b_free, isalpha, isalnum, get_next_state
+ * Parameters:
+  - pBuffer sc_buf
+ * Return values: Token
+ * Algorithm: 
+   Read a character from the source buffer, one by one, and match string patterns to tokens.
+   If an illegal sequence is found while starting a pattern off of the first matching character, 
+   it returns a token with an error code with the infringing character. If the scanner matches
+   a valid pattern it returns a Token with the appropriate code.
+*/
 Token malar_next_token(Buffer * sc_buf)
 {
-	Token t; /* token to return after recognition */
-	unsigned char c; /* input symbol */
-	int state = 0; /* initial state of the FSM */
-	short lexstart;  /*start offset of a lexeme in the input buffer */
-	short lexend;    /*end   offset of a lexeme in the input buffer */
+	Token t;           /* token to return after recognition */
+	unsigned char c;   /* input symbol */
+	int state = 0;     /* initial state of the FSM */
+	short lexstart;    /* start offset of a lexeme in the input buffer */
+	short lexend;      /* end offset of a lexeme in the input buffer */
 	int accept = NOAS; /* type of state - initially not accepting */
- /*
- lexstart is the offset from the beginning of the char buffer of the
- input buffer (sc_buf) to the first character of the current lexeme,
- which is being processed by the scanner.
- lexend is the offset from the beginning of the char buffer of the
- input buffer (sc_buf) to the last character of the current lexeme,
- which is being processed by the scanner.
 
- */
-
-
- /*DECLARE YOUR VARIABLES HERE IF NEEDED */
 	/* Counter for loops in string error case */
 	int i;
 	/*String offset for the str_LTBL*/
 	static short str_offset = 0;
-
-	pBuffer err_lex_buf;
+	/* temporary buffer used to store an erroneous string literal*/
+	pBuffer err_lex_buf; 
 
 	if (sc_buf == NULL) {
 		scerrnum = 1;
 		return aa_table[ES]("RUN TIME ERROR: "); /* WHOOPS */
 	}
 
-	while (1) { /* endless loop broken by token returns it will generate a warning */
+	while (1) { /* endless loop broken by token returns; it will generate a warning */
 
-	/* GET THE NEXT SYMBOL FROM THE INPUT BUFFER */
-
+        /* Get symbol from buffer */
 		c = b_getc(sc_buf);
 
 		switch (c) {
@@ -200,18 +211,17 @@ Token malar_next_token(Buffer * sc_buf)
 					b_retract(sc_buf); /* Retract one more time to re-read '"' into err_lex */
 					t.code = ERR_T;
 
-					err_lex_buf = b_create(1, 1, 'a');
-
+					err_lex_buf = b_create(1, 1, 'a'); /* Start up temporary buffer */
 
 					c = b_getc(sc_buf);
 					for (i = 0; i < (lexend - lexstart); c = b_getc(sc_buf), ++i) {
-						/* Continue until the end of the lexeme where error was found
-						*  (error string attribute full) */
+						/* Continue until the end of the lexeme where error was found */
 						if (i < (ERR_LEN) || c != 255)
 							b_addc(err_lex_buf, c);
 					}
+					/* Pass the complete erroneous string to error state accepting function*/
 					t = aa_table[ES](b_setmark(err_lex_buf, 0));
-					b_free(err_lex_buf);
+					b_free(err_lex_buf); /* Clean up the temporary buffer */
 					return t;
 				}
 			} /* end for loop, string finished and considered valid */
@@ -223,8 +233,7 @@ Token malar_next_token(Buffer * sc_buf)
 			for (; lexstart < lexend; c = b_getc(sc_buf), ++lexstart, ++str_offset) {
 				b_addc(str_LTBL, c);
 			}
-			b_addc(str_LTBL, '\0'); ++str_offset;
-			t.code = STR_T;
+			b_addc(str_LTBL, '\0'); ++str_offset; t.code = STR_T;
 			return t;
 
 		default:
@@ -239,9 +248,7 @@ Token malar_next_token(Buffer * sc_buf)
 
 				while (accept == NOAS) {
 					state = get_next_state(state, b_getc(sc_buf), &accept);
-
 					if (accept != NOAS) { break; }
-
 				}
 
 				/*
@@ -288,10 +295,16 @@ Token malar_next_token(Buffer * sc_buf)
 	} /*end while(1)*/
 }
 
-
-/* DO NOT MODIFY THE CODE OF THIS FUNCTION
-YOU CAN REMOVE THE COMMENTS */
-
+/* Looks up the transition table for the next state given the input character
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: char_class, assert, printf, as_table
+   Parameters: 
+    - int state: the starting point for the transition table lookup
+	- char c: the input character for table lookup
+	- int *accept: pointer to the accepting state of the scanner
+   Return values: int (the next state value of the scanner)
+*/
 int get_next_state(int state, char c, int *accept)
 {
 	int col;
@@ -301,30 +314,9 @@ int get_next_state(int state, char c, int *accept)
 #ifdef DEBUG
 	printf("Input symbol: %c Row: %d Column: %d Next: %d \n", c, state, col, next);
 #endif
-	/*
-	The assert(int test) macro can be used to add run-time diagnostic to programs
-	and to "defend" from producing unexpected results.
-	assert() is a macro that expands to an if statement;
-	if test evaluates to false (zero) , assert aborts the program
-	(by calling abort()) and sends the following message on stderr:
-
-	Assertion failed: test, file filename, line linenum
-
-	The filename and linenum listed in the message are the source file name
-	and line number where the assert macro appears.
-	If you place the #define NDEBUG directive ("no debugging")
-	in the source code before the #include <assert.h> directive,
-	the effect is to comment out the assert statement.
-	*/
+	
 	assert(next != IS);
 
-	/*
-	The other way to include diagnostics in a program is to use
-	conditional preprocessing as shown bellow. It allows the programmer
-	to send more details describing the run-time problem.
-	Once the program is tested thoroughly #define DEBUG is commented out
-	or #undef DEBUF is used - see the top of the file.
-	*/
 #ifdef DEBUG
 	if (next == IS) {
 		printf("Scanner Error: Illegal state:\n");
@@ -335,7 +327,14 @@ int get_next_state(int state, char c, int *accept)
 	*accept = as_table[next];
 	return next;
 }
-
+/* Matches the column value in the transition table to the given input character
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: N/A
+   Parameters:
+    - char c: the input character to be matched in the transition table
+   Return values: int (the value representing the column in the transition table)
+*/
 int char_class(char c)
 {
 	int val;
@@ -366,7 +365,14 @@ HERE YOU WRITE THE DEFINITIONS FOR YOUR ACCEPTING FUNCTIONS.
 ACCEPTING FUNCTION FOR THE arithmentic variable identifier AND keywords (VID - AVID/KW)
 REPLACE XX WITH THE CORRESPONDING ACCEPTING STATE NUMBER
 */
-
+/* Generates a token for an arithmetic variable identifer or keyword
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: iskeyword, calloc, aa_table[], strlen, strncpy, free
+   Parameters:
+    - char* lexeme: the string pattern matched by the FA
+   Return values: Token
+*/
 Token aa_func02(char lexeme[]) {
 	unsigned int i, kw_idx; /* Variable to contain keyword table index */
 	Token t;
@@ -430,6 +436,14 @@ Token aa_func02(char lexeme[]) {
 ACCEPTING FUNCTION FOR THE string variable identifier (VID - SVID)
 REPLACE XX WITH THE CORRESPONDING ACCEPTING STATE NUMBER
 */
+/* Generates a token for an string variable identifer
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: calloc, aa_table[], strlen, strncpy, free
+   Parameters:
+    - char* lexeme: the string pattern matched by the FA
+   Return values: Token
+*/
 Token aa_func03(char lexeme[]) {
 	Token t;
 	unsigned int i;
@@ -464,7 +478,14 @@ Token aa_func03(char lexeme[]) {
 }
 
 /*ACCEPTING FUNCTION FOR THE integer literal(IL)-decimal constant(DIL)*/
-
+/* Generates a token for a decimal integer literal constant (DIL)
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: atol, aa_table[]
+   Parameters:
+    - char* lexeme: the string pattern matched by the FA
+   Return values: Token
+*/
 Token aa_func05(char lexeme[]) {
 	Token t;
 	long temp_num;
@@ -490,7 +511,14 @@ err_lex C-type string. */
 }
 
 /*ACCEPTING FUNCTION FOR THE floating - point literal (FPL)*/
-
+/* Generates a token for a floating-point literal
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: strtof, aa_table[]
+   Parameters:
+    - char* lexeme: the string pattern matched by the FA
+   Return values: Token
+*/
 Token aa_func08(char lexeme[]) {
 	Token t;
 	double temp_dbl = 0.0f;
@@ -526,6 +554,14 @@ err_lex C-type string. */
 
 /*ACCEPTING FUNCTION FOR THE integer literal(IL) - octal constant (OIL)*/
 
+/* Generates a token for an octal integer literal
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: strlen, aa_table[], atool
+   Parameters:
+    - char* lexeme: the string pattern matched by the FA
+   Return values: Token
+*/
 Token aa_func10(char lexeme[]) {
 	Token t;
 	long new_olval;
@@ -564,29 +600,32 @@ err_lex C-type string.
 }
 
 /*ACCEPTING FUNCTION FOR THE ERROR TOKEN */
-
+/* Generates a token for a general error token
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: aa_table[]
+   Parameters:
+    - char* lexeme: the string pattern matched by the FA
+   Return values: Token
+*/
 Token aa_func12(char lexeme[]) {
-	/*
-		Token t;
-		unsigned int i;
-		t.code = ERR_T;
-		for (i = 0; i < (ERR_LEN - 1) && i < strlen(lexeme); i++)
-			t.attribute.err_lex[i] = lexeme[i];
-		t.attribute.err_lex[i] = '\0';
 
-		return t;*/
-	return aa_table[ESWR](lexeme);
-	/*
-	THE FUNCTION SETS THE ERROR TOKEN. lexeme[] CONTAINS THE ERROR
-	THE ATTRIBUTE OF THE ERROR TOKEN IS THE lexeme ITSELF
-	AND IT MUST BE STORED in err_lex. IF THE ERROR lexeme IS LONGER
-	than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
-	STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
-	err_lex C-type string.
+	/* 
+	This function does the same as aa_func13, except that it is marked as
+	non-retracting in the accepting function state, but the token is generated
+	exactly the same way
 	*/
+	return aa_table[ESWR](lexeme);
 }
 
-
+/* Generates a token for a general error token
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: strlen, aa_table[]
+   Parameters:
+    - char* lexeme: the string pattern matched by the FA
+   Return values: Token
+*/
 Token aa_func13(char lexeme[]) {
 	Token t;
 	unsigned int i;
@@ -602,36 +641,40 @@ Token aa_func13(char lexeme[]) {
 	t.attribute.err_lex[i] = '\0';
 
 	return t;
-	/*
-THE FUNCTION SETS THE ERROR TOKEN. lexeme[] CONTAINS THE ERROR
-THE ATTRIBUTE OF THE ERROR TOKEN IS THE lexeme ITSELF
-AND IT MUST BE STORED in err_lex. IF THE ERROR lexeme IS LONGER
-than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
-STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
-err_lex C-type string.
-*/
 }
 
 
 /*CONVERSION FUNCTION*/
 
+/* Returns an octal representation of a string
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: N/A
+   Parameters:
+    - char* lexeme: the string pattern to convert
+   Return values: long (integer representation of the octal string)
+*/
 long atool(char * lexeme) {
 	int i, x = 1;
 	long result = 0;
 
-	for (i = strlen(lexeme); i > 0; i--, x *= 8) {
+	for (i = strlen(lexeme); i > 0; i--, x *= 8)
 		result += x*(lexeme[i - 1] - '0');
-	}
 	return result;
-	/*
-THE FUNCTION CONVERTS AN ASCII STRING
-REPRESENTING AN OCTAL INTEGER CONSTANT TO INTEGER VALUE
-*/
 }
 
 /*HERE YOU WRITE YOUR ADDITIONAL FUNCTIONS (IF ANY).
 FOR EXAMPLE*/
 
+/* Looks up the string pattern on the keyword table
+   Author: Victor Fernandes
+   Version: 0.0.1
+   Called functions: N/A
+   Parameters:
+    - char* lexeme: the string pattern to look up in kw_table
+   Return values: int -1 (could not find a match), 
+  int [1 - KW_SIZE] index location of the matching keyword
+*/
 int iskeyword(char * kw_lexeme) {
 	int i;
 
