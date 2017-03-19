@@ -88,9 +88,9 @@ Token malar_next_token(Buffer * sc_buf)
  /*DECLARE YOUR VARIABLES HERE IF NEEDED */
 	/* Counter for loops in string error case */
 	int i;
-
 	/*String offset for the str_LTBL*/
 	static short str_offset = 0;
+
 
 	if (sc_buf == NULL) {
 		scerrnum = 1;
@@ -165,7 +165,7 @@ Token malar_next_token(Buffer * sc_buf)
 			else { /* Bad character, pump out an error token */
 				t.code = ERR_T;
 				b_retract(sc_buf);
-				b_retract(sc_buf);
+				b_retract(sc_buf); /* Retract twice to re-read '!' */
 				t.attribute.err_lex[0] = c = b_getc(sc_buf);
 				t.attribute.err_lex[1] = c = b_getc(sc_buf);
 				t.attribute.err_lex[2] = '\0';
@@ -194,18 +194,18 @@ Token malar_next_token(Buffer * sc_buf)
 			for (; c != '\"'; c = b_getc(sc_buf), ++lexend) {
 				if (c == '\n' || c == '\r')
 					++line;
-				if (c == '\0' || b_eob(sc_buf)) { /* Illegal string, make it an error token */
+				if (c == '\0' || b_eob(sc_buf) || c == 255) { /* Illegal string, make it an error token */
 					b_retract_to_mark(sc_buf);
-					b_retract(sc_buf);
 					b_retract(sc_buf);
 					t.code = ERR_T;
 
-					for (i = 0; i < lexend; ++i) {
+					c = b_getc(sc_buf);
+					for (i = 0; i < (lexend - lexstart); c = b_getc(sc_buf), ++i) {
 						/* Continue until the end of the lexeme where error was found
 						*  (error string attribute full) */
-						if (i == ERR_LEN) continue; 
-						if (i < (ERR_LEN - 3))
-							t.attribute.err_lex[i] = b_getc(sc_buf);
+						if (i < (ERR_LEN - 3)) {
+							t.attribute.err_lex[i] = c;
+						}
 						else {
 							t.attribute.err_lex[i] = '.';
 						}
@@ -215,7 +215,6 @@ Token malar_next_token(Buffer * sc_buf)
 				}
 			} /* end for loop, string finished and considered valid */
 			b_retract_to_mark(sc_buf);
-
 
 			/* Copy the matched string literal to str_LTBL */
 			t.attribute.str_offset = str_offset;
@@ -241,7 +240,6 @@ Token malar_next_token(Buffer * sc_buf)
 
 					if (accept != NOAS) { break; }
 
-					/*c = b_getc(sc_buf);*/
 				}
 
 				/*
