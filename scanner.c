@@ -195,7 +195,7 @@ Token malar_next_token(Buffer * sc_buf)
 			for (; c != '\"'; c = b_getc(sc_buf), ++lexend) {
 				if (c == '\n' || c == '\r')
 					++line;
-				if (c == '\0' || b_eob(sc_buf) || c == 255) { /* Illegal string, make it an error token */
+				if (c == '\0' || b_eob(sc_buf)) { /* Illegal string, make it an error token */
 					b_retract_to_mark(sc_buf);
 					b_retract(sc_buf); /* Retract one more time to re-read '"' into err_lex */
 					t.code = ERR_T;
