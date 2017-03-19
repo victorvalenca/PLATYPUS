@@ -194,14 +194,16 @@ Token malar_next_token(Buffer * sc_buf)
 			for (; c != '\"'; c = b_getc(sc_buf), ++lexend) {
 				if (c == '\n' || c == '\r')
 					++line;
-				if (c == '\0' || c == EOF) { /* Illegal string, make it an error token */
+				if (c == '\0' || b_eob(sc_buf)) { /* Illegal string, make it an error token */
 					b_retract_to_mark(sc_buf);
 					b_retract(sc_buf);
 					b_retract(sc_buf);
 					t.code = ERR_T;
 
 					for (i = 0; i < lexend; ++i) {
-						if (i == ERR_LEN) continue;
+						/* Continue until the end of the lexeme where error was found
+						*  (error string attribute full) */
+						if (i == ERR_LEN) continue; 
 						if (i < (ERR_LEN - 3))
 							t.attribute.err_lex[i] = b_getc(sc_buf);
 						else {
@@ -283,7 +285,7 @@ Token malar_next_token(Buffer * sc_buf)
 
 
 
-	}//end while(1)
+	} /*end while(1)*/
 }
 
 
