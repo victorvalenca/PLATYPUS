@@ -57,7 +57,7 @@ static int get_next_state(int, char, int *); /* state machine function */
 static int iskeyword(char * kw_lexeme);      /*keywords lookup functuion */
 static long atool(char * lexeme);            /* converts octal string to decimal value */
 
-/* Prepares the Scanner to read the source code buffer 
+/* Prepares the Scanner to read the source code buffer
  * Author: Svillen Ranev
  * Called functions: b_isempty, b_setmark, b_retract_to_mark, b_reset
  * Parameters:
@@ -83,9 +83,9 @@ int scanner_init(Buffer * sc_buf) {
  * Parameters:
   - pBuffer sc_buf
  * Return values: Token
- * Algorithm: 
+ * Algorithm:
    Read a character from the source buffer, one by one, and match string patterns to tokens.
-   If an illegal sequence is found while starting a pattern off of the first matching character, 
+   If an illegal sequence is found while starting a pattern off of the first matching character,
    it returns a token with an error code with the infringing character. If the scanner matches
    a valid pattern it returns a Token with the appropriate code.
 */
@@ -103,7 +103,7 @@ Token malar_next_token(Buffer * sc_buf)
 	/*String offset for the str_LTBL*/
 	static short str_offset = 0;
 	/* temporary buffer used to store an erroneous string literal*/
-	pBuffer err_lex_buf; 
+	pBuffer err_lex_buf;
 
 	if (sc_buf == NULL) {
 		scerrnum = 1;
@@ -112,7 +112,7 @@ Token malar_next_token(Buffer * sc_buf)
 
 	while (1) { /* endless loop broken by token returns; it will generate a warning */
 
-        /* Get symbol from buffer */
+		/* Get symbol from buffer */
 		c = b_getc(sc_buf);
 
 		switch (c) {
@@ -142,12 +142,15 @@ Token malar_next_token(Buffer * sc_buf)
 			}
 			else if (c == '<') {
 				t.code = SCC_OP_T; /* String concatenation operator */
+				return t;
 			}
 			else {
 				t.code = REL_OP_T;
 				t.attribute.rel_op = LT; /* Less-than operator */
+				b_retract(sc_buf);
+				return t;
 			}
-			return t;
+
 		case '.':
 			b_setmark(sc_buf, b_getcoffset(sc_buf)); /* Set mark before continuing (AND|OR case) */
 			c = b_getc(sc_buf);
@@ -299,8 +302,8 @@ Token malar_next_token(Buffer * sc_buf)
    Author: Victor Fernandes
    Version: 0.0.1
    Called functions: char_class, assert, printf, as_table
-   Parameters: 
-    - int state: the starting point for the transition table lookup
+   Parameters:
+	- int state: the starting point for the transition table lookup
 	- char c: the input character for table lookup
 	- int *accept: pointer to the accepting state of the scanner
    Return values: int (the next state value of the scanner)
@@ -314,7 +317,7 @@ int get_next_state(int state, char c, int *accept)
 #ifdef DEBUG
 	printf("Input symbol: %c Row: %d Column: %d Next: %d \n", c, state, col, next);
 #endif
-	
+
 	assert(next != IS);
 
 #ifdef DEBUG
@@ -332,7 +335,7 @@ int get_next_state(int state, char c, int *accept)
    Version: 0.0.1
    Called functions: N/A
    Parameters:
-    - char c: the input character to be matched in the transition table
+	- char c: the input character to be matched in the transition table
    Return values: int (the value representing the column in the transition table)
 */
 int char_class(char c)
@@ -370,7 +373,7 @@ REPLACE XX WITH THE CORRESPONDING ACCEPTING STATE NUMBER
    Version: 0.0.1
    Called functions: iskeyword, calloc, aa_table[], strlen, strncpy, free
    Parameters:
-    - char* lexeme: the string pattern matched by the FA
+	- char* lexeme: the string pattern matched by the FA
    Return values: Token
 */
 Token aa_func02(char lexeme[]) {
@@ -441,7 +444,7 @@ REPLACE XX WITH THE CORRESPONDING ACCEPTING STATE NUMBER
    Version: 0.0.1
    Called functions: calloc, aa_table[], strlen, strncpy, free
    Parameters:
-    - char* lexeme: the string pattern matched by the FA
+	- char* lexeme: the string pattern matched by the FA
    Return values: Token
 */
 Token aa_func03(char lexeme[]) {
@@ -483,7 +486,7 @@ Token aa_func03(char lexeme[]) {
    Version: 0.0.1
    Called functions: atol, aa_table[]
    Parameters:
-    - char* lexeme: the string pattern matched by the FA
+	- char* lexeme: the string pattern matched by the FA
    Return values: Token
 */
 Token aa_func05(char lexeme[]) {
@@ -516,28 +519,44 @@ err_lex C-type string. */
    Version: 0.0.1
    Called functions: strtof, aa_table[]
    Parameters:
-    - char* lexeme: the string pattern matched by the FA
+	- char* lexeme: the string pattern matched by the FA
    Return values: Token
 */
 Token aa_func08(char lexeme[]) {
 	Token t;
 	double temp_dbl = 0.0f;
+	unsigned int i, check = 0;
+	char* substr = (char*)calloc(ERR_LEN, sizeof(char));
 
 	t.code = FPL_T;
-	if (strstr(lexeme, "0.0")) {
+	if (strcmp(lexeme, "0.0") == 0) {
 		t.attribute.flt_value = 0.0f;
-	}
-	else  /* strtof() returns 0 if the value is out of range) */
-		temp_dbl = strtof(lexeme, NULL);
-#ifdef DEBUG
-	printf("Lexeme: '%s' | FLT value: %f  \n", lexeme, temp_dbl);
-#endif
-	if ((temp_dbl > FLT_MAX) || (temp_dbl <= 0)) { /* Overflow error */
-		t = aa_table[ES](lexeme);
 		return t;
-}
+	}
+	else {
+		for (i = 0; i < strlen(lexeme); ++i) {
+			if (lexeme[i] == '.') {
+				if (lexeme[i + 1] == '\0') {
+					strncpy(substr, lexeme, i);
+					substr[i] = '\0';
+					temp_dbl = strtof(substr, NULL);
+					check = TRUE;
+				}
+				else break;
+			}
+		}
+	}  /* strtof() returns 0 if the value is out of range) */
+	if (check != TRUE)
+		temp_dbl = strtof(lexeme, NULL);
 	t.attribute.flt_value = (float)temp_dbl;
 
+#ifdef DEBUG
+	printf("Lexeme: '%s' | FLT value: %f  | CHECK = %d\n", substr, temp_dbl, check);
+#endif
+	if ((temp_dbl > FLT_MAX) || ((temp_dbl != 0) && (temp_dbl < FLT_MIN))) { /* Overflow error */
+		t = aa_table[ES](lexeme);
+	}
+	free(substr);
 	return t;
 	/*
 THE FUNCTION MUST CONVERT THE LEXEME TO A FLOATING POINT VALUE,
@@ -559,7 +578,7 @@ err_lex C-type string. */
    Version: 0.0.1
    Called functions: strlen, aa_table[], atool
    Parameters:
-    - char* lexeme: the string pattern matched by the FA
+	- char* lexeme: the string pattern matched by the FA
    Return values: Token
 */
 Token aa_func10(char lexeme[]) {
@@ -605,12 +624,12 @@ err_lex C-type string.
    Version: 0.0.1
    Called functions: aa_table[]
    Parameters:
-    - char* lexeme: the string pattern matched by the FA
+	- char* lexeme: the string pattern matched by the FA
    Return values: Token
 */
 Token aa_func12(char lexeme[]) {
 
-	/* 
+	/*
 	This function does the same as aa_func13, except that it is marked as
 	non-retracting in the accepting function state, but the token is generated
 	exactly the same way
@@ -623,7 +642,7 @@ Token aa_func12(char lexeme[]) {
    Version: 0.0.1
    Called functions: strlen, aa_table[]
    Parameters:
-    - char* lexeme: the string pattern matched by the FA
+	- char* lexeme: the string pattern matched by the FA
    Return values: Token
 */
 Token aa_func13(char lexeme[]) {
@@ -651,7 +670,7 @@ Token aa_func13(char lexeme[]) {
    Version: 0.0.1
    Called functions: N/A
    Parameters:
-    - char* lexeme: the string pattern to convert
+	- char* lexeme: the string pattern to convert
    Return values: long (integer representation of the octal string)
 */
 long atool(char * lexeme) {
@@ -671,8 +690,8 @@ FOR EXAMPLE*/
    Version: 0.0.1
    Called functions: N/A
    Parameters:
-    - char* lexeme: the string pattern to look up in kw_table
-   Return values: int -1 (could not find a match), 
+	- char* lexeme: the string pattern to look up in kw_table
+   Return values: int -1 (could not find a match),
   int [1 - KW_SIZE] index location of the matching keyword
 */
 int iskeyword(char * kw_lexeme) {
