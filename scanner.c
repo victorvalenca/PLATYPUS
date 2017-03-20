@@ -330,6 +330,7 @@ int get_next_state(int state, char c, int *accept)
 	*accept = as_table[next];
 	return next;
 }
+
 /* Matches the column value in the transition table to the given input character
    Author: Victor Fernandes
    Version: 0.0.1
@@ -360,14 +361,6 @@ int char_class(char c)
 	return val;
 }
 
-
-/*
-HERE YOU WRITE THE DEFINITIONS FOR YOUR ACCEPTING FUNCTIONS.
-************************************************************
-
-ACCEPTING FUNCTION FOR THE arithmentic variable identifier AND keywords (VID - AVID/KW)
-REPLACE XX WITH THE CORRESPONDING ACCEPTING STATE NUMBER
-*/
 /* Generates a token for an arithmetic variable identifer or keyword
    Author: Victor Fernandes
    Version: 0.0.1
