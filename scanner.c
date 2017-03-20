@@ -209,17 +209,17 @@ Token malar_next_token(Buffer * sc_buf)
 			for (; c != '\"'; c = b_getc(sc_buf), ++lexend) {
 				if (c == '\n' || c == '\r')
 					++line;
-				if (c == '\0' || b_eob(sc_buf)) { /* Illegal string, make it an error token */
+				if (c == '\0' || c == 255) { /* Illegal string, make it an error token */
 					b_retract_to_mark(sc_buf);
 					b_retract(sc_buf); /* Retract one more time to re-read '"' into err_lex */
 					t.code = ERR_T;
 
-					err_lex_buf = b_create(1, 1, 'a'); /* Start up temporary buffer */
+					err_lex_buf = b_create(100, 10, 'a'); /* Start up temporary buffer */
 
 					c = b_getc(sc_buf);
 					for (i = 0; i < (lexend - lexstart); c = b_getc(sc_buf), ++i) {
 						/* Continue until the end of the lexeme where error was found */
-						if (i < (ERR_LEN) || c != 255)
+						if (i < (ERR_LEN) || c != 255 || c != '\0')
 							b_addc(err_lex_buf, c);
 					}
 					/* Pass the complete erroneous string to error state accepting function*/
@@ -419,26 +419,8 @@ Token aa_func02(char lexeme[]) {
 	}
 
 	return t;
-
-	/*
-	WHEN CALLED THE FUNCTION MUST
-	1. CHECK IF THE LEXEME IS A KEYWORD.
-	   IF YES, IT MUST RETURN A TOKEN WITH THE CORRESPONDING ATTRIBUTE
-	   FOR THE KEYWORD. THE ATTRIBUTE CODE FOR THE KEYWORD
-	   IS ITS INDEX IN THE KEYWORD LOOKUP TABLE (kw_table in table.h).
-	   IF THE LEXEME IS NOT A KEYWORD, GO TO STEP 2.
-
-	2. SET a AVID TOKEN.
-	   IF THE lexeme IS LONGER than VID_LEN (see token.h) CHARACTERS,
-	   ONLY FIRST VID_LEN CHARACTERS ARE STORED
-	   INTO THE VARIABLE ATTRIBUTE ARRAY vid_lex[](see token.h) .
-	   ADD \0 AT THE END TO MAKE A C-type STRING.
-		*/
 }
-/*
-ACCEPTING FUNCTION FOR THE string variable identifier (VID - SVID)
-REPLACE XX WITH THE CORRESPONDING ACCEPTING STATE NUMBER
-*/
+
 /* Generates a token for an string variable identifer
    Author: Victor Fernandes
    Version: 0.0.1
@@ -468,19 +450,8 @@ Token aa_func03(char lexeme[]) {
 
 	t.code = SVID_T;
 	return t;
-
-	/*
-	WHEN CALLED THE FUNCTION MUST
-	1. SET a SVID TOKEN.
-	   IF THE lexeme IS LONGER than VID_LEN characters,
-	   ONLY FIRST VID_LEN-1 CHARACTERS ARE STORED
-	   INTO THE VARIABLE ATTRIBUTE ARRAY vid_lex[],
-	   AND THEN THE # CHARACTER IS APPENDED TO THE NAME.
-	   ADD \0 AT THE END TO MAKE A C-type STRING.
-	  */
 }
 
-/*ACCEPTING FUNCTION FOR THE integer literal(IL)-decimal constant(DIL)*/
 /* Generates a token for a decimal integer literal constant (DIL)
    Author: Victor Fernandes
    Version: 0.0.1
@@ -494,26 +465,16 @@ Token aa_func05(char lexeme[]) {
 	long temp_num;
 
 	temp_num = atol(lexeme);
-
-	if (temp_num > SHRT_MAX || temp_num < 0) { /* Overflow error */
+	/* MOVE TO DEFINE */
+	if (temp_num > 32767 || temp_num < 0) { /* Overflow error */
 		t = aa_table[ES](lexeme);
 		return t;
 	}
 	t.code = INL_T;
 	t.attribute.int_value = (int)temp_num;
 	return t;
-	/*
-THE FUNCTION MUST CONVERT THE LEXEME REPRESENTING A DECIMAL CONSTANT
-TO A DECIMAL INTEGER VALUE, WHICH IS THE ATTRIBUTE FOR THE TOKEN.
-THE VALUE MUST BE IN THE SAME RANGE AS the value of 2-byte integer in C.
-IN CASE OF ERROR (OUT OF RANGE) THE FUNCTION MUST RETURN ERROR TOKEN
-THE ERROR TOKEN ATTRIBUTE IS  lexeme. IF THE ERROR lexeme IS LONGER
-than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
-STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
-err_lex C-type string. */
 }
 
-/*ACCEPTING FUNCTION FOR THE floating - point literal (FPL)*/
 /* Generates a token for a floating-point literal
    Author: Victor Fernandes
    Version: 0.0.1
@@ -524,54 +485,18 @@ err_lex C-type string. */
 */
 Token aa_func08(char lexeme[]) {
 	Token t;
-	double temp_dbl = 0.0f;
-	unsigned int i, check = 0;
-	char* substr = (char*)calloc(ERR_LEN, sizeof(char));
+	double temp_dbl = 0.0;
+	temp_dbl = atof(lexeme);
+
+
+	if ((temp_dbl > FLT_MAX) || ((temp_dbl != 0.0) && (temp_dbl < FLT_MIN))) { /* Overflow error */
+		return aa_table[ES](lexeme);
+	}
 
 	t.code = FPL_T;
-	if (strcmp(lexeme, "0.0") == 0) {
-		t.attribute.flt_value = 0.0f;
-		return t;
-	}
-	else {
-		for (i = 0; i < strlen(lexeme); ++i) {
-			if (lexeme[i] == '.') {
-				if (lexeme[i + 1] == '\0') {
-					strncpy(substr, lexeme, i);
-					substr[i] = '\0';
-					temp_dbl = strtof(substr, NULL);
-					check = TRUE;
-				}
-				else break;
-			}
-		}
-	}  /* strtof() returns 0 if the value is out of range) */
-	if (check != TRUE)
-		temp_dbl = strtof(lexeme, NULL);
 	t.attribute.flt_value = (float)temp_dbl;
-
-#ifdef DEBUG
-	printf("Lexeme: '%s' | FLT value: %f  | CHECK = %d\n", substr, temp_dbl, check);
-#endif
-	if ((temp_dbl > FLT_MAX) || ((temp_dbl != 0) && (temp_dbl < FLT_MIN))) { /* Overflow error */
-		t = aa_table[ES](lexeme);
-	}
-	free(substr);
 	return t;
-	/*
-THE FUNCTION MUST CONVERT THE LEXEME TO A FLOATING POINT VALUE,
-WHICH IS THE ATTRIBUTE FOR THE TOKEN.
-THE VALUE MUST BE IN THE SAME RANGE AS the value of 4-byte float in C.
-IN CASE OF ERROR (OUT OF RANGE) THE FUNCTION MUST RETURN ERROR TOKEN
-THE ERROR TOKEN ATTRIBUTE IS  lexeme. IF THE ERROR lexeme IS LONGER
-than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
-STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
-err_lex C-type string. */
 }
-
-
-
-/*ACCEPTING FUNCTION FOR THE integer literal(IL) - octal constant (OIL)*/
 
 /* Generates a token for an octal integer literal
    Author: Victor Fernandes
@@ -592,7 +517,7 @@ Token aa_func10(char lexeme[]) {
 	t.code = INL_T;
 	new_olval = atool(lexeme);
 
-	if (new_olval < SHRT_MIN || new_olval > SHRT_MAX) {
+	if (new_olval < 0 || new_olval > 32767) {
 		t = aa_table[ES](lexeme);
 		return t;
 	}
@@ -601,24 +526,8 @@ Token aa_func10(char lexeme[]) {
 	t.attribute.int_value = (int)new_olval;
 
 	return t;
-	/*
-THE FUNCTION MUST CONVERT THE LEXEME REPRESENTING AN OCTAL CONSTANT
-TO A DECIMAL INTEGER VALUE WHICH IS THE ATTRIBUTE FOR THE TOKEN.
-THE VALUE MUST BE IN THE SAME RANGE AS the value of 2-byte integer in C.
-THIS FUNCTION IS SIMILAR TO THE FUNCTION ABOVE AND THEY CAN BE
-COMBINED INTO ONE FUNCTION
-THE MAIN DIFFERENCE IE THAT THIS FUNCTION CALLS
-THE FUNCTION atool(char * lexeme) WHICH CONVERTS AN ASCII STRING
-REPRESENTING AN OCTAL NUMBER TO INTEGER VALUE
-IN CASE OF ERROR (OUT OF RANGE) THE FUNCTION MUST RETURN ERROR TOKEN
-THE ERROR TOKEN ATTRIBUTE IS  lexeme. IF THE ERROR lexeme IS LONGER
-than ERR_LEN characters, ONLY THE FIRST ERR_LEN-3 characters ARE
-STORED IN err_lex. THEN THREE DOTS ... ARE ADDED TO THE END OF THE
-err_lex C-type string.
-*/
 }
 
-/*ACCEPTING FUNCTION FOR THE ERROR TOKEN */
 /* Generates a token for a general error token
    Author: Victor Fernandes
    Version: 0.0.1
@@ -662,9 +571,6 @@ Token aa_func13(char lexeme[]) {
 	return t;
 }
 
-
-/*CONVERSION FUNCTION*/
-
 /* Returns an octal representation of a string
    Author: Victor Fernandes
    Version: 0.0.1
@@ -681,9 +587,6 @@ long atool(char * lexeme) {
 		result += x*(lexeme[i - 1] - '0');
 	return result;
 }
-
-/*HERE YOU WRITE YOUR ADDITIONAL FUNCTIONS (IF ANY).
-FOR EXAMPLE*/
 
 /* Looks up the string pattern on the keyword table
    Author: Victor Fernandes
