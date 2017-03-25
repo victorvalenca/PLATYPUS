@@ -12,7 +12,7 @@
  */
 
 ### FUNCTION DEFINITIONS ###
-/* Purpose:
+/* 
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
  * Called functions:
