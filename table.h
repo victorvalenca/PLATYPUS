@@ -47,7 +47,7 @@ int  st_table[][TABLE_COLUMNS] = {
         COLUMN # |   0    | 1 |  2  |  3  | 4 |	5  |   6   |
 				 |[a-zA-Z]| 0 |[1-7]|[8-9]| . | #  | other |
 	*/							  
-	/* State 0 */	{1,     6 ,  4 ,   4 , ES , ES ,  ES},
+	/* State 0 */	{1,     6 ,  4 ,   4 , IS , IS ,  IS},
 	/* State 1 */	{1,     1 ,  1 ,   1 ,  2 , 3  ,  2 },
 	/* State 2 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
 	/* State 3 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
@@ -56,7 +56,7 @@ int  st_table[][TABLE_COLUMNS] = {
 	/* State 6 */	{ES,    9 ,  9 ,   ES,  7 , ES ,  5 },
 	/* State 7 */	{8 ,    7 ,  7 ,    7,  8 ,  8 ,  8 },
 	/* State 8 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
-	/* State 9 */	{ES,   ES ,  11,   ES, ES , ES ,  10},
+	/* State 9 */	{ES,    9 ,  11,   ES, ES , ES ,  10},
 	/* State 10 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
 	/* State 11 */  {ES,   11 ,  11,   ES, ES , ES ,  10},
 	/* State 12 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},

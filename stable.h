@@ -30,14 +30,14 @@
 
 typedef union InitialValue {
     int int_val;   /* Integer variable initial value */
-    float fpl_val   /* Floating-point variable initial value */
-    int str_offset /* String variable initial value (location offset) */
+    float fpl_val;   /* Floating-point variable initial value */
+    int str_offset; /* String variable initial value (location offset) */
 } Value;
 
 typedef struct SymbolTableVidRecord {
-    unsigned short status_field  /* Variable record status field */
+    unsigned short status_field;  /* Variable record status field */
     char *plex;                 /* Pointer to lexeme (VID name) in CA (character array) */
-    int o_line                  /* Line of first occurence */
+    int o_line;                  /* Line of first occurence */
     Value i_value;              /* Variable initial value */
     void *reserved;             /* Reserved for future use, not needed right now */
 } STVR;
@@ -49,6 +49,7 @@ typedef struct SymbolTableDescriptor {
     Buffer *plsBD;    /* Pointer to the lexeme storage buffer descriptor */
 } STD;
 
+STD st_create(int);
 int st_install(STD, char*, char, int);
 int st_lookup(STD, char*);
 int st_change_type(STD, int, char);

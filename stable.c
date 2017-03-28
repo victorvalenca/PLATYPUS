@@ -24,6 +24,9 @@ extern STD sym_table;
  */
 STD st_create(int st_size){
     STD new_stable;
+
+    new_stable.plsBD = NULL;
+
     if (st_size <= 0 || (new_stable.pstvr = (STVR*)malloc((size_t)st_size * sizeof(STVR)) == NULL))
         new_stable.st_size = 0;
     
@@ -48,7 +51,7 @@ STD st_create(int st_size){
 */
 int st_install(STD sym_table, char *lexeme, char type, int line){
     unsigned int offset, i;
-    char f_realloc = UNSET_R_FLAG; /* Reallocation flag. Initially 0 */
+    char f_realloc; /* Reallocation flag */
 
     /* Cannot add new entry, table full */
     if (sym_table.st_offset >= sym_table.st_size)
@@ -67,28 +70,28 @@ int st_install(STD sym_table, char *lexeme, char type, int line){
         if (!b_addc(sym_table.plsBD, lexeme[i]))
             return -1;
 
-        if (b_rflag(sym_table.plsBD)== SET_R_FLAG)
+        if (b_rflag(sym_table.plsBD) == SET_R_FLAG)
             f_realloc = SET_R_FLAG;
     }
 
-    if (!b_addc(sym_tabl.plsBD, '\0'))
+    if (!b_addc(sym_table.plsBD, '\0'))
         return -1;
 
     /* Set the default mask before setting the rest of the masks */
-    sym_table.pstvr[sym_table.st_offset].status_field = DEFAULT_MASK;
+    sym_table.pstvr[sym_table.st_offset].status_field = DFT_MASK;
 
     switch (type){
         case 'I': /* Integer type */
             sym_table.pstvr[sym_table.st_offset].status_field != INT_MASK;
-            sym_Table.pstvr[sym_table.st_offset].i_value.int_val = 0;
+            sym_table.pstvr[sym_table.st_offset].i_value.int_val = 0;
             break;
         case 'F': /* Floating point type */
             sym_table.pstvr[sym_table.st_offset].status_field != FLT_MASK;
-            sym_Table.pstvr[sym_table.st_offset].i_value.int_val = 0.0f;
+            sym_table.pstvr[sym_table.st_offset].i_value.int_val = 0.0f;
             break;
         case 'S': /* String type */
             sym_table.pstvr[sym_table.st_offset].status_field != STR_MASK;
-            sym_Table.pstvr[sym_table.st_offset].i_value.str_offset = -1;
+            sym_table.pstvr[sym_table.st_offset].i_value.str_offset = -1;
             break;
         default:
             return -1; /* Not supposed to fall into here */
@@ -138,7 +141,7 @@ int st_change_type(STD sym_table, int vid_offset, char v_type) {
        Note: Can separate the statements to set the update flag at the
        end, but this resets AND updates at once
      */
-    sym_table.psvtr[vid_offset].status_field = sym_table.psvtr[vid_offset].status_field & DFT_U_MASK;
+    sym_table.pstvr[vid_offset].status_field = sym_table.pstvr[vid_offset].status_field & DFT_U_MASK;
 
     /*TODO: Ask if re-setting flags and "bailing out" is spec breaking, and
     if flags should only be set if v_type is valid */
@@ -263,19 +266,16 @@ int st_store(STD sym_table){
     for(i = 0; i < sym_table.st_size; ++i){
         fprintf(out, " %4X", sym_table.pstvr[i].status_field); /* Status flag */
         fprintf(out, " %d", (int)strlen(sym_table.pstvr[i].plex)); /* Length of lexeme */
-        fprintf(out, " %s", sym_table.stvr[i].plex); /* The lexeme itself */
-        fprintf(out, " %d", sym_table.stvr[i].o_line); /* Line number */
+        fprintf(out, " %s", sym_table.pstvr[i].plex); /* The lexeme itself */
+        fprintf(out, " %d", sym_table.pstvr[i].o_line); /* Line number */
 
         /* Initial value */
-        switch (st_get_type(sym_table, i)){
+        char type = st_get_type(sym_table, i);
+        switch (type){
             case 'I':
-                fprintf(out,"");
-                break;
             case 'F':
-                fprintf(out,"");
-                break;
             case 'S':
-                fprintf(out,"");
+            fprintf(out, " %c", type);
                 break;
         }
     }

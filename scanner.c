@@ -175,7 +175,7 @@ Token malar_next_token(Buffer * sc_buf)
 			if (c == '<') { /* It's a comment line */
 				/* Consume chars until line ends */
 				for (; c != '\0' && c != '\r' && c != '\n' && c != 255; c = b_getc(sc_buf));
-				line++;
+				++line;
 				continue;
 			}
 			else { /* Bad character, pump out an error token */
@@ -187,6 +187,7 @@ Token malar_next_token(Buffer * sc_buf)
 				t.attribute.err_lex[2] = '\0';
 				/* Consume the rest of the caracters to ignore the line*/
 				for (; c != '\0' && c != '\r' && c != '\n' && c != 255; c = b_getc(sc_buf));
+				++line;
 				return t;
 			}
 		case '=':
