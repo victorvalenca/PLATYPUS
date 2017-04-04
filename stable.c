@@ -292,9 +292,16 @@ int st_store(STD s_table){
     FILE *out; /* The target file*/
     int i;
 
+	/* Windows does not like fopen, and fopen_s is Windows-only. This will ensure the
+	 * use of the proper function call if PLATYPUS is being built on a non-windows system
+	*/
+#ifdef _WIN32
     if(fopen_s(&out, ST_FILE_NAME, "w+") != 0)
-        return -1; /* Can't open file, stop. */
-    
+#else
+	if ((out = fopen(ST_FILE_NAME, "w+")) == NULL)
+#endif
+		return -1; /* Can't open file, stop. */
+
     fprintf(out, "%d", s_table.st_size);
 
     for(i = 0; i < s_table.st_size; ++i){
