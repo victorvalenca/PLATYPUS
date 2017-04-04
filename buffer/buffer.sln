@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "buffer", "buffer\buffer.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scanner", "scanner\scanner.vcxproj", "{C53261F2-8A2D-4F75-8E54-DBFD16A621BB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Stable", "Stable\Stable.vcxproj", "{C2CCF0F1-D771-4F57-89EA-F76727169CE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		COMPILERS|x64 = COMPILERS|x64
@@ -41,6 +43,18 @@ Global
 		{C53261F2-8A2D-4F75-8E54-DBFD16A621BB}.Release|x64.Build.0 = Release|x64
 		{C53261F2-8A2D-4F75-8E54-DBFD16A621BB}.Release|x86.ActiveCfg = Release|Win32
 		{C53261F2-8A2D-4F75-8E54-DBFD16A621BB}.Release|x86.Build.0 = Release|Win32
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.COMPILERS|x64.ActiveCfg = Release|x64
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.COMPILERS|x64.Build.0 = Release|x64
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.COMPILERS|x86.ActiveCfg = Debug|Win32
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.COMPILERS|x86.Build.0 = Debug|Win32
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Debug|x64.ActiveCfg = Debug|x64
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Debug|x64.Build.0 = Debug|x64
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Debug|x86.ActiveCfg = Debug|Win32
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Debug|x86.Build.0 = Debug|Win32
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Release|x64.ActiveCfg = Release|x64
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Release|x64.Build.0 = Release|x64
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Release|x86.ActiveCfg = Release|Win32
+		{C2CCF0F1-D771-4F57-89EA-F76727169CE3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
