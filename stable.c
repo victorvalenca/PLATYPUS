@@ -303,10 +303,11 @@ int st_store(STD s_table){
     fprintf(out, "%d", s_table.st_size);
 
     for(i = 0; i < s_table.st_size; ++i){
-        fprintf(out, " %4X", s_table.pstvr[i].status_field); /* Status flag */
-        fprintf(out, " %d", (int)strlen(s_table.pstvr[i].plex)); /* Length of lexeme */
-        fprintf(out, " %s", s_table.pstvr[i].plex); /* The lexeme itself */
-        fprintf(out, " %d", s_table.pstvr[i].o_line); /* Line number */
+        fprintf(out, " %4X %d %s %d",
+            s_table.pstvr[i].status_field,      /* Status flag */
+            (int)strlen(s_table.pstvr[i].plex), /* Length of lexeme */
+            s_table.pstvr[i].plex,              /* The lexeme itself */
+            s_table.pstvr[i].o_line);           /* Line number */
 
         /* Initial value */
         char type = st_get_type(s_table, i);
@@ -346,7 +347,7 @@ static void st_incoffset(void){
 }
 
 
-/* Sorts the table by variable name in ascending/descenging order
+/* Sorts the table by variable name in ascending/descending order
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
  * Called functions:
