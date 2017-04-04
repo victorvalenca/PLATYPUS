@@ -28,18 +28,20 @@
 #define CHK_MASK        0x0006 /* Type check mask */
 #define DFT_U_MASK      0xFFF9 /* Default mask with update flag */
 
+#define ST_FILE_NAME    "$stable.ste"
+
 typedef union InitialValue {
-    int int_val;   /* Integer variable initial value */
+    int int_val;     /* Integer variable initial value */
     float fpl_val;   /* Floating-point variable initial value */
-    int str_offset; /* String variable initial value (location offset) */
+    int str_offset;  /* String variable initial value (location offset) */
 } Value;
 
 typedef struct SymbolTableVidRecord {
     unsigned short status_field;  /* Variable record status field */
-    char *plex;                 /* Pointer to lexeme (VID name) in CA (character array) */
-    int o_line;                  /* Line of first occurence */
-    Value i_value;              /* Variable initial value */
-    void *reserved;             /* Reserved for future use, not needed right now */
+    char *plex;                   /* Pointer to lexeme (VID name) in CA (character array) */
+    int o_line;                   /* Line of first occurence */
+    Value i_value;                /* Variable initial value */
+    void *reserved;               /* Reserved for future use, not needed right now */
 } STVR;
 
 typedef struct SymbolTableDescriptor {

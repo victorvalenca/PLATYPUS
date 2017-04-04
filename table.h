@@ -38,6 +38,8 @@
 #define ESWR 13   /* Error state (no retract) */
 #define IS   -1   /* Invalid state */
 
+/*Avoid platform dependency and use fixed 2-byte short */
+#define PLT_SHRT_MAX 32767
 /* State transition table definition */
 
 #define TABLE_COLUMNS 7

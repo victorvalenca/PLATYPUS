@@ -518,7 +518,7 @@ Token aa_func10(char lexeme[]) {
 	t.code = INL_T;
 	new_olval = atool(lexeme);
 
-	if (new_olval < 0 || new_olval > 32767) {
+	if (new_olval < 0 || new_olval > PLT_SHRT_MAX) {
 		t = aa_table[ES](lexeme);
 		return t;
 	}

@@ -17,9 +17,11 @@ extern STD sym_table;
 /* Create a symbol table
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
- * Parameters: int - size of the symbol table
- * Return value: The symbol table descriptor
+ * Called functions: malloc, b_create, free
+ * Parameters: 
+    int - size of the symbol table
+ * Return value: 
+    STD - The symbol table
  * Algorithm:
  */
 STD st_create(int st_size){
@@ -44,9 +46,15 @@ STD st_create(int st_size){
 /* Install a new entry in the symbol table
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
+ * Called functions: st_lookup, b_setmark, b_size, b_addc, b_rflag, st_incoffset
  * Parameters:
+    STD  - The symbol table
+    char - The lexeme to be stored
+    char - the type of the lexeme
+    int  - the line in the source file where the lexeme was found
  * Return value:
+    int - the element offset of where the symbol table is pointing to
+    -1 if an internal error occurs
  * Algorithm:
 */
 int st_install(STD sym_table, char *lexeme, char type, int line){
@@ -82,15 +90,15 @@ int st_install(STD sym_table, char *lexeme, char type, int line){
 
     switch (type){
         case 'I': /* Integer type */
-            sym_table.pstvr[sym_table.st_offset].status_field != INT_MASK;
+            sym_table.pstvr[sym_table.st_offset].status_field |= INT_MASK;
             sym_table.pstvr[sym_table.st_offset].i_value.int_val = 0;
             break;
         case 'F': /* Floating point type */
-            sym_table.pstvr[sym_table.st_offset].status_field != FLT_MASK;
+            sym_table.pstvr[sym_table.st_offset].status_field |= FLT_MASK;
             sym_table.pstvr[sym_table.st_offset].i_value.int_val = 0.0f;
             break;
         case 'S': /* String type */
-            sym_table.pstvr[sym_table.st_offset].status_field != STR_MASK;
+            sym_table.pstvr[sym_table.st_offset].status_field |= STR_MASK;
             sym_table.pstvr[sym_table.st_offset].i_value.str_offset = -1;
             break;
         default:
@@ -112,6 +120,13 @@ int st_install(STD sym_table, char *lexeme, char type, int line){
 /* Look up the lexeme string in the symbol table's buffer 
  * Author: Victor Fernandes
  * Version: 0.1
+ * Called functions: b_setmark, strcmp, strlen
+ * Parameters:
+    STD - The symbol table
+    char - The lexeme to be searched
+ * Return value:
+    int - the element offset index in the symbol table
+    -1 if no element was found
 */
 int st_lookup(STD sym_table, char *lexeme){
     int idx, i; /* idx: index locatio for symbol table, i: increment counter*/
@@ -127,10 +142,16 @@ int st_lookup(STD sym_table, char *lexeme){
     return -1; /* Found nothing */
 }
 
-/* Change the data type indicator of the variable entry located
- in vid_offset.
+/* Change the data type indicator of the variable entry located in vid_offset.
  * Author: Victor Fernandes
  * Version: 0.1
+ * Called functions: N/A
+ * Parameters:
+    STD - The symbol table
+    int - the offset location of the VID
+    char - the new type of the VID
+ * Return value:
+    1 ifchange successful, -1 if no change was made or internal error
 */
 int st_change_type(STD sym_table, int vid_offset, char v_type) {
 
@@ -141,17 +162,18 @@ int st_change_type(STD sym_table, int vid_offset, char v_type) {
        Note: Can separate the statements to set the update flag at the
        end, but this resets AND updates at once
      */
-    sym_table.pstvr[vid_offset].status_field = sym_table.pstvr[vid_offset].status_field & DFT_U_MASK;
+    /*sym_table.pstvr[vid_offset].status_field = sym_table.pstvr[vid_offset].status_field & DFT_U_MASK;*/
+    sym_table.pstvr[vid_offset].status_field &= DFT_U_MASK;
 
     /*TODO: Ask if re-setting flags and "bailing out" is spec breaking, and
     if flags should only be set if v_type is valid */
 
     switch (v_type){
         case 'I': /* Integer type */
-            sym_table.pstvr[sym_table.st_offset].status_field != INT_MASK;
+            sym_table.pstvr[sym_table.st_offset].status_field |= INT_MASK;
             break;
         case 'F': /* Floating point type */
-            sym_table.pstvr[sym_table.st_offset].status_field != FLT_MASK;
+            sym_table.pstvr[sym_table.st_offset].status_field |= FLT_MASK;
             break;
         case 'S': /* String type, do nothing as it cannot be changed */
             break;
@@ -165,10 +187,12 @@ int st_change_type(STD sym_table, int vid_offset, char v_type) {
 /* Change the i_value of the variable located by vid_offset to new Value
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
+ * Called functions: N/A
  * Parameters:
- * Return value:
- * Algorithm:
+    STD - The symbol table
+    int - the offset location of the VID
+    Value - the new value of the VID
+ * Return value: the offset location of the VID
 */
 int st_change_value(STD sym_table, int vid_offset, Value value){
     sym_table.pstvr[vid_offset].i_value = value;
@@ -178,10 +202,13 @@ int st_change_value(STD sym_table, int vid_offset, Value value){
 /* Get the type of the variable specified by vid_offset
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
+ * Called functions: N/A
  * Parameters:
+    STD - The symbol table
+    int - the offset of the VID in the table
  * Return value:
- * Algorithm:
+    char - the type of the VID ('I','F', or 'S')
+    -1 if there is an invalid value set
 */
 char st_get_type(STD sym_table, int vid_offset){
     unsigned short mask;
@@ -203,8 +230,11 @@ char st_get_type(STD sym_table, int vid_offset){
  * Version: 0.0.1
  * Called functions:
  * Parameters:
- * Return value: Value i_value, incorrect parameters will have undefined behaviour
- * Algorithm:
+    STD - The symbol table
+    int - the offset of the VID in the table
+ * Return value: 
+    Value - the value of the VID
+    Incorrect parameters will cause undefined behaviour
 */
 Value st_get_value(STD sym_table, int vid_offset){
     return sym_table.pstvr[vid_offset].i_value;
@@ -213,10 +243,9 @@ Value st_get_value(STD sym_table, int vid_offset){
 /* Free memory used by the symbol table
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
+ * Called functions: free, b_free
  * Parameters:
- * Return value:
- * Algorithm:
+    STD - The symbol table
 */
 void st_destroy(STD sym_table){
     if (sym_table.pstvr != NULL){
@@ -229,10 +258,11 @@ void st_destroy(STD sym_table){
 /* Print the contents of the symbol table to standard output
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
+ * Called functions: printf
  * Parameters:
+    STD - The symbol table
  * Return value:
- * Algorithm:
+    int - the number of items printed to stdout
 */
 int st_print(STD sym_table){
     int i;
@@ -245,20 +275,23 @@ int st_print(STD sym_table){
     
     return i;
  }
+
 /* Store the symbol table to a file named $stable.ste. 
  It overwrites any existing file named $stable.ste.
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
+ * Called functions: fopen, fprintf, st_get_type, fclose, printf
  * Parameters:
+    STD - The symbol table
  * Return value:
- * Algorithm:
+    int - the number of items stored
+    -1 if the file stream cannot be opened
 */
 int st_store(STD sym_table){
     FILE *out; /* The target file*/
     int i;
 
-    if((out = fopen("$stable.ste", "w+")) == NULL)
+    if((out = fopen(ST_FILE_NAME, "w+")) == NULL)
         return -1; /* Can't open file, stop. */
     
     fprintf(out, "%d", sym_table.st_size);
@@ -275,12 +308,11 @@ int st_store(STD sym_table){
             case 'I':
             case 'F':
             case 'S':
-            fprintf(out, " %c", type);
-                break;
+                fprintf(out, " %c", type);
         }
     }
     fclose(out);
-    printf("Symbol Tavble stored\n");
+    printf("Symbol Table stored\n");
     return i;
 }
 
@@ -288,10 +320,9 @@ int st_store(STD sym_table){
 /* Internal function to set the table size to 0.
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
- * Parameters:
- * Return value:
- * Algorithm:
+ * Called functions: N/A
+ * Parameters: N/A
+ * Return value: N/A
 */
 static void st_setsize(void){
     sym_table.st_size = 0;
@@ -300,10 +331,9 @@ static void st_setsize(void){
 /* Internal function to increment st_offset by 1.
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
- * Called functions:
- * Parameters:
- * Return value:
- * Algorithm:
+ * Called functions: N/A
+ * Parameters: N/A
+ * Return value: N/A
 */
 static void st_incoffset(void){
     ++sym_table.st_offset;
@@ -314,7 +344,7 @@ static void st_incoffset(void){
  * Author: Victor Fernandes, 040772243
  * Version: 0.0.1
  * Called functions:
- * Parameters:
+ * Parameters: 
  * Return value:
  * Algorithm:
 */
