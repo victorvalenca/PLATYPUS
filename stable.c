@@ -60,7 +60,6 @@ STD st_create(int st_size){
 */
 int st_install(STD s_table, char *lexeme, char type, int line){
     unsigned int offset, i;
-    char f_realloc; /* Reallocation flag */
 
     /* Cannot add new entry, table full */
     if (s_table.st_offset >= s_table.st_size)
@@ -78,9 +77,6 @@ int st_install(STD s_table, char *lexeme, char type, int line){
     for (i = 0; i < strlen(lexeme); ++i){
         if (!b_addc(s_table.plsBD, lexeme[i]))
             return -1;
-
-        if (b_rflag(s_table.plsBD) == SET_R_FLAG)
-            f_realloc = SET_R_FLAG;
     }
 
     if (!b_addc(s_table.plsBD, '\0'))
@@ -107,7 +103,7 @@ int st_install(STD s_table, char *lexeme, char type, int line){
     }
 
 /* TODO: Handle reallocation flag behaviour
-    if (f_realloc == SET_R_FLAG){
+    if (b_rflag(s_table.plsBD) == SET_R_FLAG){
         
     }
 */
@@ -293,12 +289,14 @@ int st_store(STD s_table){
     int i;
 
 	/* Windows does not like fopen, and fopen_s is Windows-only. This will ensure the
-	 * use of the proper function call if PLATYPUS is being built on a non-windows system
+	 * use of the proper function call if PLATYPUS is being built on a non-windows system.
+     * Best approach is to add _CRT_SECURE_NO_WARNINGS to the preprocessor definitions, but
+     * this works, too.
 	*/
 #ifdef _WIN32
     if(fopen_s(&out, ST_FILE_NAME, "w+") != 0)
 #else
-	if ((out = fopen(ST_FILE_NAME, "w+")) == NULL)
+    if ((out = fopen(ST_FILE_NAME, "w+")) == NULL)
 #endif
 		return -1; /* Can't open file, stop. */
 
@@ -357,5 +355,8 @@ static void st_incoffset(void){
  * Algorithm:
 */
 int st_sort(STD s_table, char s_order){
+    /* Compiler warning about unused parameter, 
+     * this is fine for this "future" implementation 
+    */
      return 0; /* SYKE! */
 }

@@ -372,7 +372,7 @@ int char_class(char c)
    Return values: Token
 */
 Token aa_func02(char lexeme[]) {
-	unsigned int i, kw_idx, offset; /* Variable to contain keyword table index */
+	unsigned kw_idx, offset; /* Variable to contain keyword table index */
 	Token t;
 	char v_type;
 	char* temp_str;
@@ -431,7 +431,7 @@ Token aa_func02(char lexeme[]) {
 */
 Token aa_func03(char lexeme[]) {
 	Token t;
-	unsigned int i, offset;
+	unsigned offset;
 	char* temp_str;
 	if ((temp_str = (char*)calloc(VID_LEN + 2, sizeof(char))) == NULL) {
 		return aa_table[ES]("RUN TIME ERROR: ");
