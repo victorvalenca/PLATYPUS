@@ -23,7 +23,6 @@
 #include "buffer.h"
 #include "token.h"
 #include "stable.h" /*Do not remove this line. SiR */
-#include "stable.h" /*Do not remove this line. SiR */
 
 /* constant definitions */
 /* Input buffer parameters */

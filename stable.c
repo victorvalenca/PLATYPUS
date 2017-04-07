@@ -29,16 +29,16 @@ STD st_create(int st_size){
 
     new_stable.plsBD = NULL;
 	new_stable.pstvr = (STVR*)malloc((size_t)st_size * sizeof(STVR));
-    if (st_size <= 0 || (new_stable.pstvr == NULL))
+    if (st_size <= 0 || (new_stable.pstvr == NULL)) {
         new_stable.st_size = 0;
-    
+    }
 	new_stable.plsBD = b_create(100, 1, 'a');
     if (new_stable.plsBD == NULL) {
         free(new_stable.plsBD);
         new_stable.st_size = 0;
     }
 
-    new_stable.st_size = 0;
+    new_stable.st_size = st_size;
     new_stable.st_offset = 0;
 
     return new_stable;
@@ -66,21 +66,22 @@ int st_install(STD s_table, char *lexeme, char type, int line){
         return -1;
     
     /* Look for an existing entry in the symbol table */
-    if ((offset = st_lookup(s_table, lexeme)) > -1)
+    offset = st_lookup(s_table, lexeme);
+    if (offset > -1)
         return offset;
-
-    /* Set proper pointer values on symbol table */
-    s_table.pstvr[s_table.st_offset].plex = b_setmark(s_table.plsBD, b_size(s_table.plsBD));
-    s_table.pstvr[s_table.st_offset].o_line = line;
 
     /* Add lexeme to the symbol table's lexeme buffer */
     for (i = 0; i < strlen(lexeme); ++i){
         if (!b_addc(s_table.plsBD, lexeme[i]))
             return -1;
     }
-
     if (!b_addc(s_table.plsBD, '\0'))
         return -1;
+
+    /* Set proper pointer values on symbol table */
+    s_table.pstvr[s_table.st_offset].plex = b_setmark(s_table.plsBD, b_size(s_table.plsBD));
+    s_table.pstvr[s_table.st_offset].o_line = line;
+
 
     /* Set the default mask before setting the rest of the masks */
     s_table.pstvr[s_table.st_offset].status_field = DFT_MASK;
@@ -102,11 +103,11 @@ int st_install(STD s_table, char *lexeme, char type, int line){
             return -1; /* Not supposed to fall into here */
     }
 
-/* TODO: Handle reallocation flag behaviour
+/* TODO: Handle reallocation flag behaviour*/
     if (b_rflag(s_table.plsBD) == SET_R_FLAG){
-        
+        printf("memory got tossed around\n");
     }
-*/
+
 
     /* Increment the symbol table offset */
     st_incoffset();
@@ -126,16 +127,17 @@ int st_install(STD s_table, char *lexeme, char type, int line){
     -1 if no element was found
 */
 int st_lookup(STD s_table, char *lexeme){
-    int idx, i; /* idx: index locatio for symbol table, i: increment counter*/
-    char *head;
+    int idx, i; /* idx: index location for symbol table, i: increment counter*/
+    char *store;
 
-    head = b_setmark(s_table.plsBD, 0); /*Get head of the lexeme storage */
+    store = b_setmark(s_table.plsBD, 0); /* Get head of the lexeme storage */
     for (i = 0, idx = 0; i < s_table.st_offset; ++i) {
-        if (strcmp(lexeme, head + idx) == 0)
+        if (strncmp(lexeme, store + idx, strlen(lexeme)) == 0)
             return i;
         else
-            idx+= (short)(strlen(head + idx) + 1);
+            idx+= (short)(strlen(store + idx) + 1);
     }
+    printf("found nothing\n");
     return -1; /* Found nothing */
 }
 
@@ -148,7 +150,7 @@ int st_lookup(STD s_table, char *lexeme){
     int - the offset location of the VID
     char - the new type of the VID
  * Return value:
-    1 ifchange successful, -1 if no change was made or internal error
+    1 if change successful, -1 if no change was made or internal error
 */
 int st_change_type(STD s_table, int vid_offset, char v_type) {
 
@@ -266,9 +268,9 @@ int st_print(STD s_table){
     
     if (s_table.st_size <=0) return -1;
     
-    printf("Symbol Table\n____________\nLine Number\tVariable Identifier");
+    printf("Symbol Table\n____________\nLine Number\tVariable Identifier\n");
     for(i = 0; i < s_table.st_offset; ++i)
-        printf("%2d\t%s\n", s_table.pstvr[i].o_line, s_table.pstvr[i].plex);
+        printf("%2d\t\t%s\n", s_table.pstvr[i].o_line, s_table.pstvr[i].plex);
     
     return i;
  }
@@ -294,7 +296,7 @@ int st_store(STD s_table){
      * this works, too.
 	*/
 #ifdef _WIN32
-    if(fopen_s(&out, ST_FILE_NAME, "w+") != 0)
+    if (fopen_s(&out, ST_FILE_NAME, "w+") != 0 || out == NULL)
 #else
     if ((out = fopen(ST_FILE_NAME, "w+")) == NULL)
 #endif

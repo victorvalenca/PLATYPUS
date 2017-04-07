@@ -32,8 +32,8 @@
 /* project header files */
 #include "buffer.h"
 #include "token.h"
-#include "table.h"
 #include "stable.h"
+#include "table.h"
 
 #define DEBUG  /* for conditional processing */
 #undef  DEBUG
@@ -375,7 +375,7 @@ Token aa_func02(char lexeme[]) {
 	unsigned kw_idx, offset; /* Variable to contain keyword table index */
 	Token t;
 	char v_type;
-	char* temp_str;
+	/*char* temp_str;*/
 
 #ifdef DEBUG
 	printf("Lexeme: '%s'\n", lexeme);
@@ -390,11 +390,11 @@ Token aa_func02(char lexeme[]) {
 
 	/* Not a keyword? Must be AVID*/
 	t.code = AVID_T;
-	if ((temp_str = (char*)calloc(VID_LEN + 1, sizeof(char))) == NULL) {
+	/*if ((temp_str = (char*)calloc(VID_LEN + 1, sizeof(char))) == NULL) {
 		return aa_table[ES]("RUN TIME ERROR: ");
 	}
 
-	strncpy(temp_str, lexeme, VID_LEN);
+	strncpy(temp_str, lexeme, VID_LEN);*/
 
 	switch (lexeme[0]) { /* Read first character of lexeme for implicit type (not used yet?)*/
 	case 'i':
@@ -409,14 +409,14 @@ Token aa_func02(char lexeme[]) {
 		v_type = 'F';
 		break;
 	}
-	if ((offset = st_install(sym_table, temp_str, v_type, line)) == -1){
+	if ((offset = st_install(sym_table, lexeme, v_type, line)) == -1){
 		printf("Error: Install failed - Symbol Table is full.\n");
 		st_store(sym_table);
-		free(temp_str);
+		free(lexeme);
 		exit(1);
 	}
 	t.attribute.vid_offset = offset;
-	free(temp_str);
+	/*free(temp_str);*/
 
 	return t;
 }
@@ -431,24 +431,24 @@ Token aa_func02(char lexeme[]) {
 */
 Token aa_func03(char lexeme[]) {
 	Token t;
-	unsigned offset;
+	unsigned offset;/*
 	char* temp_str;
 	if ((temp_str = (char*)calloc(VID_LEN + 2, sizeof(char))) == NULL) {
 		return aa_table[ES]("RUN TIME ERROR: ");
-	}
+	}*/
 
-	strncpy(temp_str, lexeme, VID_LEN);
-	temp_str[strlen(temp_str) - 1] = '#'; /* Add# to end of the SVID */
+	/*strncpy(temp_str, lexeme, VID_LEN);*/
+	lexeme[strlen(lexeme) - 1] = '#'; /* Add # to end of the SVID */
 	
-	if ((offset = st_install(sym_table, temp_str, 'S', line)) == -1){
+	if ((offset = st_install(sym_table, lexeme, 'S', line)) == -1){
 		printf("Error: Install failed - Symbol Table is full.\n");
 		st_store(sym_table);
-		free(temp_str);
+		free(lexeme);
 		exit(1);
 	}
 	t.code = SVID_T;
 	t.attribute.vid_offset = offset;
-	free(temp_str);
+	/*free(temp_str);*/
 
 	return t;
 }
@@ -557,11 +557,12 @@ Token aa_func12(char lexeme[]) {
 */
 Token aa_func13(char lexeme[]) {
 	Token t;
-	unsigned int i;
+	unsigned int i = strlen(lexeme);
 	t.code = ERR_T;
+/*
 	for (i = 0; i < (ERR_LEN) && i < strlen(lexeme); i++)
 		t.attribute.err_lex[i] = lexeme[i];
-
+*/
 	if (strlen(lexeme) > ERR_LEN) {
 		t.attribute.err_lex[i - 1] = '.';
 		t.attribute.err_lex[i - 2] = '.';

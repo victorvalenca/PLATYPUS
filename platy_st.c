@@ -201,10 +201,10 @@ void print_token(Token t){
 		printf("SEOF_T\n" );
 	break;
 	case  AVID_T:
-		printf("AVID_T\t\t%s\n",t.attribute.vid_lex);
+		printf("AVID_T\t\t%d\n",t.attribute.vid_offset);
 	break;
 	case  SVID_T:
-		printf("SVID_T\t\t%s\n",t.attribute.vid_lex);
+		printf("SVID_T\t\t%d\n",t.attribute.vid_offset);
 	break;
 	case  FPL_T:
 		printf("FPL_T\t\t%f\n",t.attribute.flt_value);
