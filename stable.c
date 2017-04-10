@@ -9,6 +9,12 @@
  */
 #include "stable.h"
 
+#define PLSBD_SZ 256
+#define PLSBD_INC 8
+
+#define DEBUG
+/*#undef DEBUG*/
+
 /* Forward function declarations */
 static void st_setsize(void);
 static void st_incoffset(void);
@@ -32,7 +38,7 @@ STD st_create(int st_size){
     if (st_size <= 0 || (new_stable.pstvr == NULL)) {
         new_stable.st_size = 0;
     }
-	new_stable.plsBD = b_create(100, 1, 'a');
+	new_stable.plsBD = b_create(PLSBD_SZ, PLSBD_INC, 'a');
     if (new_stable.plsBD == NULL) {
         free(new_stable.plsBD);
         new_stable.st_size = 0;
@@ -59,7 +65,8 @@ STD st_create(int st_size){
  * Algorithm:
 */
 int st_install(STD s_table, char *lexeme, char type, int line){
-    unsigned int offset, i;
+    unsigned int offset, i, j, lex_len;
+    short bd_offset, flag;
 
     /* Cannot add new entry, table full */
     if (s_table.st_offset >= s_table.st_size)
@@ -71,12 +78,22 @@ int st_install(STD s_table, char *lexeme, char type, int line){
         return offset;
 
     /* Add lexeme to the symbol table's lexeme buffer */
-    for (i = 0; i < strlen(lexeme); ++i){
+    lex_len = strlen(lexeme);
+    for (i = 0; i <= lex_len; ++i){
         if (!b_addc(s_table.plsBD, lexeme[i]))
             return -1;
+        if (b_rflag(s_table.plsBD) == SET_R_FLAG){ /* COPY NEW ADDRESSES TO PLEX ENTRIES */
+            flag = 1;
+        }
     }
-    if (!b_addc(s_table.plsBD, '\0'))
-        return -1;
+    if (flag == 1){
+        bd_offset = 0;
+        for (j = 0; j <= s_table.st_offset; ++i){
+            s_table.pstvr[j].plex = b_setmark(s_table.plsBD, bd_offset + s_table.pstvr[j].i_value.str_offset);
+            bd_offset += s_table.pstvr[j].i_value.str_offset + 1; /*Add one because the offset doesn't include '\0' */
+        }
+    }
+           
 
     /* Set proper pointer values on symbol table */
     s_table.pstvr[s_table.st_offset].plex = b_setmark(s_table.plsBD, b_size(s_table.plsBD));
@@ -103,11 +120,6 @@ int st_install(STD s_table, char *lexeme, char type, int line){
             return -1; /* Not supposed to fall into here */
     }
 
-/* TODO: Handle reallocation flag behaviour*/
-    if (b_rflag(s_table.plsBD) == SET_R_FLAG){
-        printf("memory got tossed around\n");
-    }
-
 
     /* Increment the symbol table offset */
     st_incoffset();
@@ -127,17 +139,15 @@ int st_install(STD s_table, char *lexeme, char type, int line){
     -1 if no element was found
 */
 int st_lookup(STD s_table, char *lexeme){
-    int idx, i; /* idx: index location for symbol table, i: increment counter*/
-    char *store;
+    int i; /* idx: index location for symbol table, i: increment counter*/
 
-    store = b_setmark(s_table.plsBD, 0); /* Get head of the lexeme storage */
-    for (i = 0, idx = 0; i < s_table.st_offset; ++i) {
-        if (strncmp(lexeme, store + idx, strlen(lexeme)) == 0)
+    for (i = s_table.st_offset; i >= 0; --i) {
+        if (strcmp(lexeme, s_table.pstvr[i].plex) == 0)
             return i;
-        else
-            idx+= (short)(strlen(store + idx) + 1);
     }
+#ifdef DEBUG
     printf("found nothing\n");
+#endif
     return -1; /* Found nothing */
 }
 

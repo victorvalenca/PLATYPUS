@@ -22,7 +22,7 @@
 /* standard header files */
 #include <stdio.h>  /* standard input/output */
 
-#ifdef MACOS_DEP
+#ifndef WIN32
     #include <mm_malloc.h> /* for dynamic memory allocation.*/
 #else
     #include <malloc.h>
