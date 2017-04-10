@@ -88,9 +88,10 @@ int st_install(STD s_table, char *lexeme, char type, int line){
     }
     if (flag == 1){
         bd_offset = 0;
-        for (j = 0; j <= s_table.st_offset; ++i){
+        for (j = 0; j <= s_table.st_offset; ++j){
             s_table.pstvr[j].plex = b_setmark(s_table.plsBD, bd_offset + s_table.pstvr[j].i_value.str_offset);
-            bd_offset += s_table.pstvr[j].i_value.str_offset + 1; /*Add one because the offset doesn't include '\0' */
+            if (j < s_table.st_offset) 
+                bd_offset += s_table.pstvr[j+1].i_value.str_offset + 1; /*Add one because the offset doesn't include '\0' */
         }
     }
            
