@@ -9,11 +9,11 @@
  */
 #include "stable.h"
 
-#define PLSBD_SZ 40
-#define PLSBD_INC 8
+#define PLSBD_SZ 128
+#define PLSBD_INC 64
 
 #define DEBUG
- /*#undef DEBUG*/
+#undef DEBUG*/
 
  /* Forward function declarations */
 static void st_setsize(void);
@@ -65,7 +65,7 @@ STD st_create(int st_size) {
  * Algorithm:
 */
 int st_install(STD s_table, char *lexeme, char type, int line) {
-	int offset = -1, i, j, lex_len, bd_offset, lex_offset = 0, flag = 0;
+	int offset = -1, i, j, lex_len, lex_offset = 0, flag = 0;
 
 	/* Cannot add new entry, table full */
 	if (s_table.st_offset >= s_table.st_size)
@@ -83,16 +83,14 @@ int st_install(STD s_table, char *lexeme, char type, int line) {
 	for (i = 0; i <= lex_len; ++i) {
 		if (!b_addc(s_table.plsBD, lexeme[i]))
 			return -1;
-		if (b_rflag(s_table.plsBD) == SET_R_FLAG) { /* COPY NEW ADDRESSES TO PLEX ENTRIES */
+		if (b_rflag(s_table.plsBD) == SET_R_FLAG) { /* Trigger reassignment loop once lexeme is stored */
 			flag = 1;
 		}
 	}
+	/* If reallocation happened...*/
 	if (flag == 1) {
-		bd_offset = 0;
-		for (j = 0; j <= s_table.st_offset; ++j) {
-			s_table.pstvr[j].plex = b_setmark(s_table.plsBD, (short)(bd_offset + s_table.pstvr[j].i_value.str_offset));
-			if (j < s_table.st_offset)
-				bd_offset += s_table.pstvr[j + 1].i_value.str_offset + 1; /*Add one because the offset doesn't include '\0' */
+		for (j = 0; j < s_table.st_offset; ++j) {
+			s_table.pstvr[j].plex = b_setmark(s_table.plsBD, (short) s_table.pstvr[j].i_value.str_offset);
 		}
 	}
 
@@ -151,7 +149,9 @@ int st_lookup(STD s_table, char *lexeme) {
 #endif
 	for (i = s_table.st_offset - 1; i >= 0; --i) {
 		if (strcmp(lexeme, s_table.pstvr[i].plex) == 0) {
+#ifdef DEBUG
 			printf("YES\n");
+#endif
 			return i;
 		}
 	}
@@ -184,15 +184,12 @@ int st_change_type(STD s_table, int vid_offset, char v_type) {
 	 /*sym_table.pstvr[vid_offset].status_field = sym_table.pstvr[vid_offset].status_field & DFT_U_MASK;*/
 	s_table.pstvr[vid_offset].status_field &= DFT_U_MASK;
 
-	/*TODO: Ask if re-setting flags and "bailing out" is spec breaking, and
-	if flags should only be set if v_type is valid */
-
 	switch (v_type) {
 	case 'I': /* Integer type */
-		s_table.pstvr[s_table.st_offset].status_field |= INT_MASK;
+		s_table.pstvr[vid_offset].status_field |= INT_MASK;
 		break;
 	case 'F': /* Floating point type */
-		s_table.pstvr[s_table.st_offset].status_field |= FLT_MASK;
+		s_table.pstvr[vid_offset].status_field |= FLT_MASK;
 		break;
 	case 'S': /* String type, do nothing as it cannot be changed */
 		break;
@@ -289,7 +286,7 @@ int st_print(STD s_table) {
 	if (s_table.st_size <= 0) return -1;
 
 	printf("Symbol Table\n____________\nLine Number\tVariable Identifier\n");
-	for (i = 0; i < s_table.st_offset - 1 ; ++i)
+	for (i = 0; i <= s_table.st_offset - 1 ; ++i)
 		printf("%2d\t\t%s\n", s_table.pstvr[i].o_line, s_table.pstvr[i].plex);
 
 	return i;
@@ -324,7 +321,7 @@ int st_store(STD s_table) {
 
 	fprintf(out, "%d", s_table.st_size);
 
-	for (i = 0; i < s_table.st_size; ++i) {
+	for (i = 0; i < s_table.st_offset; ++i) {
 		fprintf(out, " %4X %d %s %d",
 			s_table.pstvr[i].status_field,      /* Status flag */
 			(int)strlen(s_table.pstvr[i].plex), /* Length of lexeme */
@@ -378,8 +375,8 @@ static void st_incoffset(void) {
  * Algorithm:
 */
 int st_sort(STD s_table, char s_order) {
-	/* Compiler warning about unused parameter,
-	 * this is fine for this "future" implementation
+	/* Compiler warning about unused parameters,
+	 * this is fine for this dummy method
 	*/
 	return 0; /* SYKE! */
 }
