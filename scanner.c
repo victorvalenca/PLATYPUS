@@ -267,7 +267,7 @@ Token malar_next_token(Buffer * sc_buf)
 
 				b_retract_to_mark(sc_buf);
 
-				lex_buf = b_create(1, 1, 'a');
+				lex_buf = b_create(20, 8, 'a');
 
 				/* Copy the scanned lexeme into lexical buffer */
 				for (; lexstart < lexend; ++lexstart) {
