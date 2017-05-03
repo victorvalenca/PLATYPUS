@@ -45,24 +45,24 @@
 #define TABLE_COLUMNS 7
 /*transition table - type of states defined in separate table */
 int  st_table[][TABLE_COLUMNS] = {
-	/*	INPUT COLUMNS:
+    /*	INPUT COLUMNS:
         COLUMN # |   0    | 1 |  2  |  3  | 4 |	5  |   6   |
-				 |[a-zA-Z]| 0 |[1-7]|[8-9]| . | #  | other |
-	*/							  
-	/* State 0 */	{1,     6 ,  4 ,   4 , IS , IS ,  IS},
-	/* State 1 */	{1,     1 ,  1 ,   1 ,  2 , 3  ,  2 },
-	/* State 2 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
-	/* State 3 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
-	/* State 4 */	{ES,    4 ,  4 ,   4 ,  7 ,  5 ,  5 },
-	/* State 5 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
-	/* State 6 */	{ES,    9 ,  9 ,   ES,  7 , ES ,  5 },
-	/* State 7 */	{8 ,    7 ,  7 ,    7,  8 ,  8 ,  8 },
-	/* State 8 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
-	/* State 9 */	{ES,    9 ,  11,   ES, ES , ES ,  10},
-	/* State 10 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
-	/* State 11 */  {ES,   11 ,  11,   ES, ES , ES ,  10},
-	/* State 12 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
-	/* State 13 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS}
+                 |[a-zA-Z]| 0 |[1-7]|[8-9]| . | #  | other |
+    */							  
+    /* State 0 */	{1,     6 ,  4 ,   4 , IS , IS ,  IS},
+    /* State 1 */	{1,     1 ,  1 ,   1 ,  2 , 3  ,  2 },
+    /* State 2 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
+    /* State 3 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
+    /* State 4 */	{ES,    4 ,  4 ,   4 ,  7 ,  5 ,  5 },
+    /* State 5 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
+    /* State 6 */	{ES,    9 ,  9 ,   ES,  7 , ES ,  5 },
+    /* State 7 */	{8 ,    7 ,  7 ,    7,  8 ,  8 ,  8 },
+    /* State 8 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
+    /* State 9 */	{ES,    9 ,  11,   ES, ES , ES ,  10},
+    /* State 10 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
+    /* State 11 */  {ES,   11 ,  11,   ES, ES , ES ,  10},
+    /* State 12 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS},
+    /* State 13 */	{IS,   IS ,  IS,   IS, IS , IS ,  IS}
 
 };
 /* Accepting state table definition */
@@ -72,20 +72,20 @@ int  st_table[][TABLE_COLUMNS] = {
 
 int as_table[] = {
 
-	/* State 0 */	NOAS,
-	/* State 1 */	NOAS,
-	/* State 2 */	ASWR,
-	/* State 3 */	ASNR,
-	/* State 4 */	NOAS,
-	/* State 5 */	ASWR,
-	/* State 6 */	NOAS,
-	/* State 7 */	NOAS,
-	/* State 8 */	ASWR,
-	/* State 9 */	NOAS,
-	/* State 10 */	ASWR,
-	/* State 11 */	NOAS,
-	/* State 12 */	ASNR,
-	/* State 13 */	ASWR
+    /* State 0 */	NOAS,
+    /* State 1 */	NOAS,
+    /* State 2 */	ASWR,
+    /* State 3 */	ASNR,
+    /* State 4 */	NOAS,
+    /* State 5 */	ASWR,
+    /* State 6 */	NOAS,
+    /* State 7 */	NOAS,
+    /* State 8 */	ASWR,
+    /* State 9 */	NOAS,
+    /* State 10 */	ASWR,
+    /* State 11 */	NOAS,
+    /* State 12 */	ASNR,
+    /* State 13 */	ASWR
 
 };
 
@@ -113,21 +113,21 @@ typedef Token(*PTR_AAF)(char *lexeme);
 
 PTR_AAF aa_table[] = {
 
-	/* State 0 */	NULL,
-	/* State 1 */	NULL,
-	/* State 2 */	aa_func02,
-	/* State 3 */	aa_func03,
-	/* State 4 */	NULL,
-	/* State 5 */	aa_func05,
-	/* State 6 */	NULL,
-	/* State 7 */	NULL,
-	/* State 8 */	aa_func08,
-	/* State 9 */	NULL,
-	/* State 10 */	aa_func10,
-	/* State 11 */	NULL,
-	/* State 12 */	aa_func12,
-	/* State 13 */	aa_func13
-	
+    /* State 0 */	NULL,
+    /* State 1 */	NULL,
+    /* State 2 */	aa_func02,
+    /* State 3 */	aa_func03,
+    /* State 4 */	NULL,
+    /* State 5 */	aa_func05,
+    /* State 6 */	NULL,
+    /* State 7 */	NULL,
+    /* State 8 */	aa_func08,
+    /* State 9 */	NULL,
+    /* State 10 */	aa_func10,
+    /* State 11 */	NULL,
+    /* State 12 */	aa_func12,
+    /* State 13 */	aa_func13
+    
 };
 
 /* Keyword lookup table (.AND. and .OR. are not keywords) */
@@ -135,14 +135,14 @@ PTR_AAF aa_table[] = {
 #define KWT_SIZE  8
 
 char * kw_table[] = {
-					  "ELSE",
-					  "IF",
-					  "INPUT",
-					  "OUTPUT",
-					  "PLATYPUS",
-					  "REPEAT",
-					  "THEN",
-					  "USING"
+                      "ELSE",
+                      "IF",
+                      "INPUT",
+                      "OUTPUT",
+                      "PLATYPUS",
+                      "REPEAT",
+                      "THEN",
+                      "USING"
 };
 
 #endif
