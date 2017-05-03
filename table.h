@@ -46,7 +46,7 @@
 /*transition table - type of states defined in separate table */
 int  st_table[][TABLE_COLUMNS] = {
     /*	INPUT COLUMNS:
-        COLUMN # |   0    | 1 |  2  |  3  | 4 |	5  |   6   |
+        COLUMN # |   0    | 1 |  2  |  3  | 4 | 5  |   6   |
                  |[a-zA-Z]| 0 |[1-7]|[8-9]| . | #  | other |
     */							  
     /* State 0 */	{1,     6 ,  4 ,   4 , IS , IS ,  IS},
