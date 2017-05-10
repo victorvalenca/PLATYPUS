@@ -1,6 +1,7 @@
 /* File Name: parser.c
  * The PLATYPUS parsing program for the final assignment of
  How To Train Your Dragon (AKA Compilers)
+ * Compiler: GNU GCC 6
  * Author: Victor Fernandes, 040772243
  * Course: CST8152 - Compilers, Lab Section: 011
  * Date: April 21, 2017
@@ -11,14 +12,14 @@
 #include "parser.h"
 
 /* Global variables for the parser */
- Token lookahead;
- extern int synerrno;       /* Error counter */
- extern char* kw_table[];   /* Keyword table with matching enum */
- extern STD sym_table;      /* The symbol table */
- extern Buffer* sc_buf;     /* Scanner buffer */
- extern Buffer* str_LTBL;   /* String literal table */
- extern int line            /* Line position of the Scanner */
-
+Token lookahead;
+int synerrno;                            /* Error counter */
+Buffer *sc_buf;                          /* Scanner buffer */
+extern char *kw_table[];                 /* Keyword table with matching enum */
+extern STD sym_table;                    /* The symbol table */
+extern Buffer *str_LTBL;                 /* String literal table */
+extern int line;                         /* Line position of the Scanner */
+extern Token malar_next_token(Buffer *); /* Scanner function to get the next token */
 
 /* Begins the source file parsing
  * Author: Victor Fernandes, 040772243
@@ -29,6 +30,7 @@
  */
 void parser(pBuffer in_buf)
 {
+    synerrno = 0;
     sc_buf = in_buf;
     lookahead = malar_next_token(sc_buf);
     program();
@@ -68,7 +70,7 @@ void match(int pr_token_code, int pr_token_attribute)
         lookahead = malar_next_token(sc_buf);
         if (lookahead.code == ERR_T)
         {
-            synerrno++;
+            ++synerrno;
             syn_printe();
             lookahead = malar_next_token(sc_buf);
         }
@@ -90,7 +92,7 @@ void match(int pr_token_code, int pr_token_attribute)
 void syn_eh(int pr_token_code)
 {
     syn_printe();
-    synerrno++;
+    ++synerrno;
 
     while (lookahead.code != SEOF_T)
     {
@@ -117,7 +119,7 @@ void syn_eh(int pr_token_code)
  */
 void syn_printe()
 {
-    printf("PLATY: Syntax error:   Line:%3d\n" + "*****  Token code: %3d Attribute: ", line, lookahead.code);
+    printf("PLATY: Syntax error:   Line:%3d\n*****  Token code: %3d Attribute: ", line, lookahead.code);
     switch (lookahead.code)
     {
     case ERR_T:
@@ -196,7 +198,6 @@ void gen_incode(char *code)
  * Grammar functions ahoy 
  */
 
-
 /*
  * <additive_arithmetic_expression> ->
     <multiplicative_arithmetic_expression> <additive_arithmetic_expression_prime>
@@ -215,7 +216,7 @@ void additive_arithmetic_expression()
  */
 void additive_arithmetic_expression_prime()
 {
-    if (lookahead.code == ART_OP &&
+    if (lookahead.code == ART_OP_T &&
         lookahead.attribute.arr_op != MULT &&
         lookahead.attribute.arr_op != DIV)
     {
@@ -233,6 +234,9 @@ void additive_arithmetic_expression_prime()
  */
 void arithmetic_expression()
 {
+    /* GCC complains that PLUS and MINUS enums aren't handled,
+    but this is automatically handled in additive_arithmetic_expression() 
+    */
     switch (lookahead.code)
     {
     case ART_OP_T:
@@ -389,7 +393,7 @@ void logical_or_expression()
     .OR.  <logical_and_expression> <logical_or_expression_prime>
     FIRST Set = { .OR., E }
  */
-voic logical_or_expression_prime()
+void logical_or_expression_prime()
 {
     if (lookahead.code == LOG_OP_T &&
         lookahead.attribute.log_op == OR)
@@ -450,7 +454,8 @@ void opt_statements()
         }
     case AVID_T:
     case SVID_T:
-        statements() : break;
+        statements();
+        break;
     default:
         gen_incode("PLATY: Opt_statements parsed");
     }
@@ -522,18 +527,18 @@ void primary_arithmetic_expression()
 {
     switch (lookahead.code)
     {
-        case AVID_T:
-        case FPL_T:
-        case INL_T:
-            match(lookahead.code, lookahead.attribute.arr_op);
-            break;
-        case LPR_T:
-            match(lookahead.code, lookahead.attribute,arr_op);
-            arithmetic_expression();
-            match(RPR_T, NO_ATTR);
-        default:
-            syn_printe();
-            return;
+    case AVID_T:
+    case FPL_T:
+    case INL_T:
+        match(lookahead.code, lookahead.attribute.arr_op);
+        break;
+    case LPR_T:
+        match(lookahead.code, lookahead.attribute.arr_op);
+        arithmetic_expression();
+        match(RPR_T, NO_ATTR);
+    default:
+        syn_printe();
+        return;
     }
     gen_incode("PLATY: Primary arithmetic expression parsed");
 }
@@ -661,7 +666,7 @@ void relational_expression_prime_string()
         case NE:
         case GT:
         case LT:
-            match(lookahead.codem, lookahead.attribute.arr_op);
+            match(lookahead.code, lookahead.attribute.arr_op);
             primary_s_relational_expression();
             return;
         }
@@ -791,7 +796,7 @@ void string_expression_prime()
     {
         match(SCC_OP_T, NO_ATTR);
         primary_string_expression();
-        stirng_expression_prime();
+        string_expression_prime();
     }
 }
 
@@ -803,6 +808,7 @@ void string_expression_prime()
  */
 void unary_arithmetic_expression()
 {
+    /* Again, GCC complains about PLUS and MINUS enums */
     switch (lookahead.code)
     {
     case ART_OP_T:

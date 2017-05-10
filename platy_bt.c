@@ -1,7 +1,7 @@
 /*  File name: platy_bt.c
  *  Purpose:This is the main program for Assignment #1, CST8152, Winter 17
  *  Version: 1.17.1
- *  Author: Svillen Ranev
+ *  Author: S^R
  *  Date: 9 January 2017
  */   
 

@@ -1,8 +1,8 @@
 /* Filename: stable.h
  * Compiler: msvc (Visual Studio 2015)
  * Function declarations for the symbol table 
- * CST8152, Assignment #3 
- * Professor: Svillen Ranev
+ * CST8152, Assignment #3
+ * Professor: S^R
  * Author: Victor Fernandes, 040772243
  * Version: 0.1
  * Date: 24 March 2017

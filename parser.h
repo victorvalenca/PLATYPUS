@@ -3,7 +3,7 @@
  * Author: Victor Fernandes, 040772243
  * Course: CST8152 - Compilers, Lab Section: 011
  * Date: April 17, 2017
- * Professor: Svillen Ravev
+ * Professor: S^R
  * Version: 0.1
  */
 #ifndef PARSER_H_
@@ -63,6 +63,7 @@ void statement(void);
 void statements(void);
 void statements_prime(void);
 void string_expression(void);
+void string_expression_prime(void);
 void unary_arithmetic_expression(void);
 void variable_identifier(void);
 void variable_list(void);

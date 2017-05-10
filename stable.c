@@ -2,7 +2,7 @@
  * Compiler: msvc (Visual Studio 2015)
  * Store and provide functions for the symbol table database
  * CST8152, Assignment #3
- * Professor: Svillen Ranev
+ * Professor: S^R
  * Author: Victor Fernandes, 040772243
  * Version: 0.1
  * Date: 24 March 2017
@@ -13,7 +13,7 @@
 #define PLSBD_INC 64
 
 #define DEBUG
-#undef DEBUG*/
+#undef DEBUG
 
  /* Forward function declarations */
 static void st_setsize(void);

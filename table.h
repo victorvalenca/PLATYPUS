@@ -4,7 +4,7 @@
  * Author: Victor Fernandes, 040772243
  * Version: 1.17.1
  * Date: 30 January 2017
- * Provided by: Svillen Ranev
+ * Provided by: S^R
  */
 
 #ifndef  TABLE_H_

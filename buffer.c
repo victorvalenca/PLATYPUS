@@ -4,7 +4,7 @@
  * Author: Victor Fernandes, 040772243
  * Course: CST8152 - Compilers, Lab Section: 011
  * Date: February 1, 2017
- * Professor: Svillen Ranev
+ * Professor: S^R
  * A character buffer utility with three modes of self-incrementation
  through dynamic memory allocation, and ability to set a mark flag.
  * Function list: b_create, b_isfull, b_isempty, b_size, b_capacity,

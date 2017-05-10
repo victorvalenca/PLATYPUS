@@ -2,7 +2,7 @@
  *  Purpose:This is the main program for Assignment #2 - Scanner
  *  CST8152 - Compilers
  *  Version: 1.17.1
- *  Author: Svillen Ranev
+ *  Author: S^R
  *  Date: 30 January 2017
  */ 
 

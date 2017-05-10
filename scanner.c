@@ -5,7 +5,7 @@
  * scanner_init() must be called before using the scanner.
  * The file is incomplete;
  * Author: Victor Fernandes, 040772243
- * Provided by: Svillen Ranev
+ * Provided by: S^R
  * Version: 1.17.1
  * Date: 30 January 2017
  * Function list: scanner_init, malar_next_token, get_next_state, char_class,
@@ -45,7 +45,7 @@
    It is defined in platy_st.c */
 extern Buffer * str_LTBL; /*String literal table */
 int line;                 /* current line number of the source code */
-extern int scerrnum;      /* defined in platy_st.c - run-time error number */
+extern int synerrno;      /* defined in platy_st.c - run-time error number */
 extern STD sym_table;     /* symbol table */
 /* Local(file) global objects - variables */
 static Buffer *lex_buf;   /*pointer to temporary lexeme buffer*/
@@ -74,7 +74,7 @@ int scanner_init(Buffer * sc_buf) {
 	b_reset(str_LTBL);
 	line = 1;
 	return EXIT_SUCCESS;/*0*/
-/*   scerrnum = 0;  *//*no need - global ANSI C */
+/*   synerrno = 0;  *//*no need - global ANSI C */
 }
 /* Reads the source code buffer and generates a token
  * Author: Victor Fernandes
@@ -107,7 +107,8 @@ Token malar_next_token(Buffer * sc_buf)
 	pBuffer err_lex_buf;
 
 	if (sc_buf == NULL) {
-		scerrnum = 1;
+		synerrno
+	 = 1;
 		return aa_table[ES]("RUN TIME ERROR: "); /* WHOOPS */
 	}
 
@@ -279,7 +280,8 @@ Token malar_next_token(Buffer * sc_buf)
 					t = aa_table[state](b_setmark(lex_buf, 0));
 				}
 				else {
-					scerrnum = 1;
+					synerrno
+				 = 1;
 					t = aa_table[ES]("RUN TIME ERROR: ");
 					return t;
 				}

@@ -2,7 +2,7 @@
  * Purpose:This is the main program for Assignment #3 - Symbol Table
  * CST8152 - Compilers
  * Version: 1.17.01
- * Author: Svillen Ranev
+ * Author: S^R
  * Date: 1 March 2017
  */ 
 
