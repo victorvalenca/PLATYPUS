@@ -9,7 +9,7 @@
 
 - `make [gcc | clang]`
     - No argument will build both versions (this is an aftermath of having to check behaviour in the binary from multiple compilers)
-    - It is safe to modify the default to either gcc or clang if you wish. ** SEE NOTES BELOW **
+    - It is safe to modify the default to either gcc or clang if you wish.
 - **NOTE: I haven't tested or created make targets for the final implementation yet. This is somewhat buried deep into the backburner**
 ### Windows
 #### Requires
